@@ -8,7 +8,10 @@
         class="tile is-child box card-child"
         :class="isCurrentHour ? 'shadow' : ''"
       >
-        <p class="title">{{ hour }}:00</p>
+        <p class="title">
+          {{ hour }}:00
+          <i class="fa-solid fa-circle-plus"></i>
+        </p>
         <p class="subtitle">Harley Ferreira</p>
       </article>
 
@@ -27,7 +30,7 @@
         :class="isCurrentHour ? 'shadow' : ''"
       >
         <p class="title">{{ hour }}:20</p>
-        <p class="subtitle">Harley Ferreira</p>
+        <p class="subtitle">Clarice Lispector</p>
       </article>
 
       <article
@@ -82,7 +85,12 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
+i {
+  position: relative;
+  margin-left: 0.25rem;
+}
+
 p.title {
   font-size: large;
 }

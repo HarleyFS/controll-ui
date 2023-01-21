@@ -66,17 +66,20 @@
       </article>
     </div>
   </div>
+  <AgendaForm></AgendaForm>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { DatePicker } from "v-calendar";
 import CardTimeComponent from "@/components/CardTimeComponent.vue";
+import AgendaForm from "./agenda/AgendaForm.vue";
 
 export default defineComponent({
   components: {
     DatePicker,
     CardTimeComponent,
+    AgendaForm,
   },
 
   setup() {
