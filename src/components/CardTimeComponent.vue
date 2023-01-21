@@ -17,7 +17,9 @@
         :class="isCurrentHour ? 'shadow' : ''"
       >
         <p class="title">{{ hour }}:10</p>
-        <p class="subtitle">Harley Ferreira</p>
+        <p class="subtitle" style="background-color: #4de06a">
+          Harley Ferreira
+        </p>
       </article>
 
       <article
@@ -33,7 +35,9 @@
         :class="isCurrentHour ? 'shadow' : ''"
       >
         <p class="title">{{ hour }}:30</p>
-        <p class="subtitle">Harley Ferreira</p>
+        <p class="subtitle" style="background-color: #e6693e">
+          Harley Ferreira
+        </p>
       </article>
 
       <article
@@ -41,7 +45,9 @@
         :class="isCurrentHour ? 'shadow' : ''"
       >
         <p class="title">{{ hour }}:40</p>
-        <p class="subtitle">Harley Ferreira</p>
+        <p class="subtitle" style="background-color: #f9b247">
+          Harley Ferreira
+        </p>
       </article>
 
       <article
