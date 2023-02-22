@@ -1,12 +1,17 @@
 <template>
   <div class="container">
     <div class="card-login">
-      <form>
+      <form @submit.prevent="authenticate">
         <h2 class="title">Login</h2>
 
         <div class="field">
           <p class="control has-icons-left has-icons-right">
-            <input class="input" type="email" placeholder="Email" />
+            <input
+              class="input"
+              type="email"
+              placeholder="Email"
+              v-model="user.email"
+            />
             <span class="icon is-small is-left">
               <i class="fas fa-envelope"></i>
             </span>
@@ -15,7 +20,12 @@
 
         <div class="field">
           <p class="control has-icons-left">
-            <input class="input" type="password" placeholder="Password" />
+            <input
+              class="input"
+              type="password"
+              placeholder="Password"
+              v-model="user.password"
+            />
             <span class="icon is-small is-left">
               <i class="fas fa-lock"></i>
             </span>
@@ -26,9 +36,7 @@
           <a>Esqueceu sua senha?</a>
         </router-link>
 
-        <router-link to="/agenda">
-          <input type="submit" class="button" value="Entrar" />
-        </router-link>
+        <input type="submit" class="button" value="Entrar" />
 
         <router-link to="/register">
           <input type="submit" class="button" value="Cria uma conta" />
@@ -38,12 +46,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
+import type Login from "@/interfaces/authentication/ILogin";
+import AuthenticationService from "@/services/AuthenticationService";
 
-export default defineComponent({
-  setup() {},
+const user = ref<Login>({
+  email: "",
+  password: "",
 });
+
+const authenticate = (): void => {
+  AuthenticationService.authenticate(user.value)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => console.log(error));
+};
 </script>
 
 <style scoped>

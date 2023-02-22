@@ -1,47 +1,74 @@
 <template>
   <div class="container">
     <div class="card-login">
-      <form>
+      <form @submit.prevent="register">
         <h2 class="title">Cadastre-se</h2>
 
         <div class="field">
-          <input class="input" type="text" placeholder="Nome" />
+          <input
+            class="input"
+            type="text"
+            placeholder="Nome"
+            v-model="user.name"
+          />
         </div>
 
         <div class="field">
-          <input class="input" type="text" placeholder="Sobrenome" />
+          <input
+            class="input"
+            type="text"
+            placeholder="Sobrenome"
+            v-model="user.lastname"
+          />
         </div>
 
         <div class="field">
-          <input class="input" type="email" placeholder="Email" />
+          <input
+            class="input"
+            type="email"
+            placeholder="Email"
+            v-model="user.email"
+          />
         </div>
 
         <div class="field">
-          <input class="input" type="text" placeholder="CPF/CNPJ" />
-        </div>
-
-        <div class="field">
-          <input class="input" type="password" placeholder="Senha" />
+          <input
+            class="input"
+            type="password"
+            placeholder="Senha"
+            v-model="user.password"
+          />
         </div>
 
         <router-link to="/login">
           <a>Tem uma conta? Conecte-se</a>
         </router-link>
 
-        <router-link to="/register">
-          <input type="submit" class="button" value="Cadastrar" />
-        </router-link>
+        <input type="submit" class="button" value="Cadastrar" />
       </form>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
+import type User from "@/interfaces/authentication/IUser";
+import AuthenticationService from "@/services/AuthenticationService";
 
-export default defineComponent({
-  setup() {},
+const user = ref<User>({
+  email: "",
+  name: "",
+  password: "",
+  lastname: "",
 });
+
+const register = (): void => {
+  AuthenticationService.register(user.value)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => console.log(error));
+};
 </script>
 
 <style scoped>
