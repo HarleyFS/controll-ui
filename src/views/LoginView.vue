@@ -50,16 +50,21 @@
 import { ref } from "vue";
 import type Login from "@/interfaces/authentication/ILogin";
 import AuthenticationService from "@/services/AuthenticationService";
+import { userStore } from "@/stores/user-store";
+import router from "@/router";
 
 const user = ref<Login>({
   email: "",
   password: "",
 });
 
+const store = userStore();
+
 const authenticate = (): void => {
   AuthenticationService.authenticate(user.value)
     .then((response) => {
-      console.log(response);
+      store.storeToken(response.data.token);
+      router.push({ name: "dashboard" });
     })
     .catch((error) => console.log(error));
 };

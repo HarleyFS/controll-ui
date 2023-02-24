@@ -54,6 +54,7 @@
 import { ref } from "vue";
 import type User from "@/interfaces/authentication/IUser";
 import AuthenticationService from "@/services/AuthenticationService";
+import router from "@/router";
 
 const user = ref<User>({
   email: "",
@@ -64,8 +65,8 @@ const user = ref<User>({
 
 const register = (): void => {
   AuthenticationService.register(user.value)
-    .then((response) => {
-      console.log(response);
+    .then(() => {
+      router.push("/login");
     })
     .catch((error) => console.log(error));
 };
