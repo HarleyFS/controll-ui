@@ -44,11 +44,11 @@
     <PaginationComponent></PaginationComponent>
   </section>
 
-  <PacientForm />
+  <PacientForm :render="render" @closeForm="renderModal()"></PacientForm>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import PacientForm from "@/views/patient/PatientForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import { usePatientStore } from "@/stores/patient-store";

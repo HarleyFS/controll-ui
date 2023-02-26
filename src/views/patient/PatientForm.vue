@@ -1,8 +1,8 @@
 <template>
-  <ModalComponent :show="render">
+  <ModalComponent :show="props.render">
     <template v-slot:header>
       <p class="modal-card-title">Cadastrar novo paciente</p>
-      <button @click="renderModal" class="delete" aria-label="close"></button>
+      <button @click="close()" class="delete" aria-label="close"></button>
     </template>
 
     <template v-slot:body>
@@ -20,11 +20,21 @@
           <CardInput inputSize="is-9" nameLabel="Sexo">
             <div class="control" style="margin-top: 1rem">
               <label class="radio">
-                <input type="radio" name="answer" value="MALE" />
+                <input
+                  type="radio"
+                  name="answer"
+                  :value="Gender.MALE"
+                  v-model="patient.gender"
+                />
                 Masculino
               </label>
               <label class="radio">
-                <input type="radio" name="answer" value="FEMALE" />
+                <input
+                  type="radio"
+                  name="answer"
+                  :value="Gender.FEMALE"
+                  v-model="patient.gender"
+                />
                 Feminino
               </label>
             </div>
@@ -158,33 +168,9 @@
           <CardInput inputSize="is-2" nameLabel="Estado">
             <div class="select">
               <select v-model="patient.address.state">
-                <option>AC</option>
-                <option>AL</option>
-                <option>AP</option>
-                <option>AM</option>
-                <option>BA</option>
-                <option>CE</option>
-                <option>DF</option>
-                <option>ES</option>
-                <option>GO</option>
-                <option>MA</option>
-                <option>MT</option>
-                <option>MS</option>
-                <option>MG</option>
-                <option>PA</option>
-                <option>PB</option>
-                <option>PR</option>
-                <option>PE</option>
-                <option>PI</option>
-                <option>RJ</option>
-                <option>RN</option>
-                <option>RS</option>
-                <option>RO</option>
-                <option>RR</option>
-                <option>SC</option>
-                <option>SP</option>
-                <option>SE</option>
-                <option>TO</option>
+                <option v-for="state in states" v-bind:key="state">
+                  {{ state }}
+                </option>
               </select>
             </div>
           </CardInput>
@@ -203,7 +189,7 @@
 
     <template v-slot:footer>
       <button @click="register" class="button button-person">Salvar</button>
-      <button @click="renderModal" class="button">Cancelar</button>
+      <button @click="close()" class="button">Cancelar</button>
     </template>
   </ModalComponent>
 </template>
@@ -215,8 +201,6 @@ import { reactive, ref } from "vue";
 import type Patient from "@/interfaces/patient/IPatient";
 import PatientService from "@/services/PatientService";
 import { Gender } from "@/enums/GenderEnum";
-const render = ref(true);
-
 const patient = reactive<Patient>({
   fullName: "",
   gender: Gender.FEMALE,
@@ -234,23 +218,60 @@ const patient = reactive<Patient>({
     district: "",
     city: "",
     state: "",
-    country: "",
+    country: "Brasil",
     zipCode: "",
     complement: "",
   },
 });
 
+const states = reactive([
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
+]);
+
 function register(): void {
   PatientService.registerPatient(patient)
     .then((response) => {
+      close();
       console.log(response);
     })
     .catch((error) => console.log(error));
 }
 
-const renderModal = () => {
-  render.value = !render.value;
-};
+const props = defineProps({
+  render: Boolean,
+});
+
+const emit = defineEmits(["closeForm"]);
+
+function close(): void {
+  emit("closeForm");
+}
 </script>
 
 <style scoped>
