@@ -22,102 +22,21 @@
         <tr>
           <th>Nome</th>
           <th>Sobrenome</th>
-          <th>CPF</th>
           <th>Telefone</th>
-          <th>Cidade</th>
-          <th>Estado</th>
+          <th>Idade</th>
+          <th>Genero</th>
+          <th>Email</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
-        </tr>
-
-        <tr>
-          <td>Harley</td>
-          <td>Ferreira</td>
-          <td>125.125.154-75</td>
-          <td>(11) 94499-3371</td>
-          <td>São Paulo</td>
-          <td>SP</td>
+        <tr v-for="patient in patientList" :key="Number(patient.id)">
+          <td>{{ patient.name }}</td>
+          <td>{{ patient.lastName }}</td>
+          <td>{{ patient.cellNumber }}</td>
+          <td>{{ patient.birthDate }}</td>
+          <td>{{ patient.gender }}</td>
+          <td>{{ patient.email }}</td>
         </tr>
       </tbody>
     </table>
@@ -129,9 +48,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import PacientForm from "@/views/patient/PatientForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
+import { usePatientStore } from "@/stores/patient-store";
+import type Patient from "@/interfaces/patient/IPatientList";
+
 export default defineComponent({
   name: "PacientView",
   components: {
@@ -141,14 +63,22 @@ export default defineComponent({
 
   setup() {
     const render = ref(false);
+    const patientStore = usePatientStore();
+    const patientList = ref<Array<Patient>>([]);
 
     const renderModal = () => {
       render.value = !render.value;
     };
 
+    onMounted(async () => {
+      await patientStore.getPatientList();
+      patientList.value = patientStore.patientList;
+    });
+
     return {
       render,
       renderModal,
+      patientList,
     };
   },
 });
