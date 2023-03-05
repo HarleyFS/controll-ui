@@ -3,10 +3,13 @@ import axios, { type AxiosInstance } from "axios";
 
 const store = userStore();
 
+const isLogged = store.token != null && store.token.length > 0;
+
 const httpClient: AxiosInstance = axios.create({
   baseURL: "http://localhost:8080/controll",
   headers: {
-    Authorization: `Bearer ${store.token}`,
+    ContentType: "application/json",
+    Authorization: isLogged ? `Bearer ${store.token}` : "",
   },
 });
 
