@@ -63,14 +63,19 @@ export default defineComponent({
           icon: "fa fa-home",
         },
         {
+          link: "/agenda",
+          name: "Agenda",
+          icon: "fas fa-calendar",
+        },
+        {
           link: "/pacient",
           name: "Pacientes",
           icon: "fa fa-user-group",
         },
         {
-          link: "/agenda",
-          name: "Agenda",
-          icon: "fas fa-calendar",
+          link: "/doctor",
+          name: "Doutores",
+          icon: "fas fa-user-doctor",
         },
         {
           link: "/about",
