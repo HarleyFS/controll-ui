@@ -2,7 +2,7 @@
   <ModalComponent :show="render">
     <template v-slot:header>
       <p class="modal-card-title">Novo agendamento</p>
-      <button @click="renderModal" class="delete" aria-label="close"></button>
+      <button @click="close()" class="delete" aria-label="close"></button>
     </template>
 
     <template v-slot:body>
@@ -42,36 +42,68 @@
     </template>
 
     <template v-slot:footer>
-      <button class="button button-person">Salvar</button>
-      <button @click="renderModal" class="button">Voltar</button>
-      <button class="button button-person">Editar</button>
-      <button @click="renderModal" class="button is-danger">Cancelar</button>
+      <button class="button button-person" @click="create()" v-if="!id">
+        Salvar
+      </button>
+      <button class="button" @click="close()" v-if="!id">Voltar</button>
+
+      <button class="button button-person" @click="update()" v-if="id">
+        Editar
+      </button>
+      <button class="button is-danger" @click="close()" v-if="id">
+        Cancelar
+      </button>
     </template>
   </ModalComponent>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import ModalComponent from "@/components/ModalComponent.vue";
 import CardInput from "@/components/CardInputComponent.vue";
-import { defineComponent, ref } from "vue";
+import ScheduleService from "@/services/ScheduleService";
+import type Schedule from "@/interfaces/schedule/IScheduleCreate";
+import { Gender } from "@/enums/GenderEnum";
+import { reactive } from "vue";
 
-export default defineComponent({
-  components: { ModalComponent, CardInput },
-  name: "PacientForm",
-
-  setup() {
-    const render = ref(true);
-
-    const renderModal = () => {
-      render.value = !render.value;
-    };
-
-    return {
-      render,
-      renderModal,
-    };
-  },
+const schedule = reactive<Schedule>({
+  id: null,
+  fullName: "",
+  gender: Gender.FEMALE,
+  birthDate: new Date(),
+  scheduleDate: new Date(),
+  cellNumber: "",
 });
+
+const props = defineProps({
+  render: Boolean,
+  id: Number,
+});
+
+const emit = defineEmits(["closeForm"]);
+
+function close(): void {
+  emit("closeForm");
+}
+
+function create(): void {
+  ScheduleService.createSchedule(schedule)
+    .then((response) => {
+      close();
+      console.log(response);
+    })
+    .catch((error) => console.log(error));
+}
+
+function update(): void {
+  if (props.id) {
+    ScheduleService.updateSchedule(props.id, schedule)
+      .then((response) => {
+        close();
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  }
+}
 </script>
 
 <style scoped>

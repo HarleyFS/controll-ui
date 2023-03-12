@@ -10,9 +10,9 @@
       >
         <p class="title">
           {{ hour }}:00
-          <i class="fa-solid fa-circle-plus"></i>
+          <i class="fa-solid fa-circle-plus" @click="open()"></i>
         </p>
-        <p class="subtitle">Harley Ferreira</p>
+        <p class="subtitle" @click="open()">Harley Ferreira</p>
       </article>
 
       <article
@@ -64,25 +64,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 
-export default defineComponent({
-  props: {
-    hour: {
-      type: Number,
-      default: 1,
-    },
-  },
-  setup(props) {
-    const currentHour = ref(new Date().getHours());
-    const isCurrentHour = currentHour.value == props.hour;
-    return {
-      props,
-      isCurrentHour,
-    };
+const props = defineProps({
+  hour: {
+    type: Number,
+    default: 1,
   },
 });
+
+const currentHour = ref(new Date().getHours());
+const isCurrentHour = currentHour.value == props.hour;
+const emit = defineEmits(["openForm"]);
+
+function open(): void {
+  emit("openForm");
+}
 </script>
 
 <style scoped>

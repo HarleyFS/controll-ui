@@ -8,7 +8,7 @@
           </div>
           <div class="body-agenda">
             <span v-for="(i, index) of list" :key="index">
-              <CardTimeComponent :hour="i" />
+              <CardTimeComponent :hour="i" @openForm="renderModal()" />
             </span>
           </div>
         </article>
@@ -66,35 +66,29 @@
       </article>
     </div>
   </div>
-  <AgendaForm></AgendaForm>
+  <AgendaForm :render="render" @closeForm="renderModal()" />
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useScheduleStore } from "@/stores/schedule-store";
 import { DatePicker } from "v-calendar";
 import CardTimeComponent from "@/components/CardTimeComponent.vue";
 import AgendaForm from "./agenda/AgendaForm.vue";
 
-export default defineComponent({
-  components: {
-    DatePicker,
-    CardTimeComponent,
-    AgendaForm,
-  },
+const render = ref(true);
+const schedueleStore = useScheduleStore();
 
-  setup() {
-    const date = ref(new Date());
-    const begin = ref(7);
-    const final = ref(24);
-    const list = ref(
-      Array.from({ length: final.value - begin.value }, (_, i) => i + 6 + 1)
-    );
-    return {
-      date,
-      list,
-    };
-  },
-});
+const date = ref(new Date());
+const begin = ref(7);
+const final = ref(24);
+const list = ref(
+  Array.from({ length: final.value - begin.value }, (_, i) => i + 6 + 1)
+);
+
+const renderModal = () => {
+  render.value = !render.value;
+};
 </script>
 
 <style scoped>
