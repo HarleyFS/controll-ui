@@ -1,8 +1,11 @@
-<script setup lang="ts"></script>
-
 <template>
+  <NotificationComponent />
   <RouterView />
 </template>
+
+<script setup lang="ts">
+import NotificationComponent from "./components/NotificationComponent.vue";
+</script>
 
 <style>
 :root {

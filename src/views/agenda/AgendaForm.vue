@@ -80,7 +80,8 @@ import ScheduleService from "@/services/ScheduleService";
 import type Schedule from "@/interfaces/schedule/IScheduleCreate";
 import { Gender } from "@/enums/GenderEnum";
 import { reactive } from "vue";
-
+import { userNotifyStore } from "@/stores/notify-store";
+import { NotificationTypeEnum } from "@/enums/NotificationTypeEnum";
 const schedule = reactive<Schedule>({
   id: null,
   fullName: "",
@@ -101,13 +102,33 @@ function close(): void {
   emit("closeForm");
 }
 
+const notifyStore = userNotifyStore();
+
 function create(): void {
+  console.log(schedule);
   ScheduleService.createSchedule(schedule)
     .then((response) => {
       close();
+      notifyStore.notify({
+        id: 0,
+        title: "SUCESSO",
+        text: "Sucesso ao salvar paciente",
+        type: NotificationTypeEnum.SUCCESS,
+      });
       console.log(response);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      for (let e in error.response.data) {
+        notifyStore.notify({
+          id: 0,
+          title: "ERRO",
+          text: error.response.data[e].mensagem,
+          type: NotificationTypeEnum.ERROR,
+        });
+      }
+
+      console.log(error);
+    });
 }
 
 function update(): void {
