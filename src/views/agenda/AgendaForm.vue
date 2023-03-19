@@ -8,23 +8,38 @@
     <template v-slot:body>
       <div class="columns">
         <CardInput inputSize="is-9" nameLabel="Nome">
-          <input class="input" type="text" placeholder="Nome completo" />
+          <input
+            class="input"
+            type="text"
+            placeholder="Nome completo"
+            v-model="schedule.fullName"
+          />
         </CardInput>
       </div>
 
       <div class="columns">
-        <CardInput inputSize="is-3" nameLabel="Idade">
-          <input class="input" type="text" placeholder="Idade" />
+        <CardInput inputSize="is-3" nameLabel="Data nascimento">
+          <input class="date" type="date" v-model="schedule.birthDate" />
         </CardInput>
 
         <CardInput inputSize="is-3" nameLabel="Sexo">
           <div class="control" style="margin-top: 1rem">
             <label class="radio">
-              <input type="radio" name="answer" />
+              <input
+                type="radio"
+                name="answer"
+                :value="Gender.MALE"
+                v-model="schedule.gender"
+              />
               Masculino
             </label>
             <label class="radio">
-              <input type="radio" name="answer" />
+              <input
+                type="radio"
+                name="answer"
+                :value="Gender.FEMALE"
+                v-model="schedule.gender"
+              />
               Feminino
             </label>
           </div>
@@ -35,7 +50,8 @@
             class="input"
             type="text"
             placeholder="(00) 00000-0000"
-            v-mask="['(##) ####-####', '(##) #####-####']"
+            v-mask="['(##) #####-####']"
+            v-model="schedule.cellNumber"
           />
         </CardInput>
       </div>
@@ -69,9 +85,9 @@ const schedule = reactive<Schedule>({
   id: null,
   fullName: "",
   gender: Gender.FEMALE,
+  cellNumber: "",
   birthDate: new Date(),
   scheduleDate: new Date(),
-  cellNumber: "",
 });
 
 const props = defineProps({
