@@ -197,10 +197,12 @@
 <script lang="ts" setup>
 import ModalComponent from "@/components/ModalComponent.vue";
 import CardInput from "@/components/CardInputComponent.vue";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import type Patient from "@/interfaces/patient/IPatient";
 import PatientService from "@/services/PatientService";
 import { Gender } from "@/enums/GenderEnum";
+import useNotifierHook from "@/hooks/notifier-hook";
+
 const patient = reactive<Patient>({
   fullName: "",
   gender: Gender.FEMALE,
@@ -254,13 +256,16 @@ const states = reactive([
   "TO",
 ]);
 
+const { notifySuccess, notifyError } = useNotifierHook();
+
 function register(): void {
   PatientService.registerPatient(patient)
     .then((response) => {
       close();
+      notifySuccess("Paciente cadastrado com sucesso!");
       console.log(response);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => notifyError(error));
 }
 
 const props = defineProps({

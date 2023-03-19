@@ -55,6 +55,7 @@ import { ref } from "vue";
 import type User from "@/interfaces/authentication/IUser";
 import AuthenticationService from "@/services/AuthenticationService";
 import router from "@/router";
+import useNotifierHook from "@/hooks/notifier-hook";
 
 const user = ref<User>({
   email: "",
@@ -63,12 +64,14 @@ const user = ref<User>({
   lastname: "",
 });
 
+const { notifyError } = useNotifierHook();
+
 const register = (): void => {
   AuthenticationService.register(user.value)
     .then(() => {
       router.push("/login");
     })
-    .catch((error) => console.log(error));
+    .catch((error) => notifyError(error));
 };
 </script>
 

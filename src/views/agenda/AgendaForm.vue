@@ -80,8 +80,8 @@ import ScheduleService from "@/services/ScheduleService";
 import type Schedule from "@/interfaces/schedule/IScheduleCreate";
 import { Gender } from "@/enums/GenderEnum";
 import { reactive } from "vue";
-import { userNotifyStore } from "@/stores/notify-store";
-import { NotificationTypeEnum } from "@/enums/NotificationTypeEnum";
+import useNotifierHook from "@/hooks/notifier-hook";
+
 const schedule = reactive<Schedule>({
   id: null,
   fullName: "",
@@ -90,6 +90,8 @@ const schedule = reactive<Schedule>({
   birthDate: new Date(),
   scheduleDate: new Date(),
 });
+
+const { notifySuccess, notifyError } = useNotifierHook();
 
 const props = defineProps({
   render: Boolean,
@@ -102,33 +104,15 @@ function close(): void {
   emit("closeForm");
 }
 
-const notifyStore = userNotifyStore();
-
 function create(): void {
   console.log(schedule);
   ScheduleService.createSchedule(schedule)
     .then((response) => {
       close();
-      notifyStore.notify({
-        id: 0,
-        title: "SUCESSO",
-        text: "Sucesso ao salvar paciente",
-        type: NotificationTypeEnum.SUCCESS,
-      });
+      notifySuccess("Consulta agendada com sucesso!");
       console.log(response);
     })
-    .catch((error) => {
-      for (let e in error.response.data) {
-        notifyStore.notify({
-          id: 0,
-          title: "ERRO",
-          text: error.response.data[e].mensagem,
-          type: NotificationTypeEnum.ERROR,
-        });
-      }
-
-      console.log(error);
-    });
+    .catch((error) => notifyError(error));
 }
 
 function update(): void {
@@ -136,9 +120,10 @@ function update(): void {
     ScheduleService.updateSchedule(props.id, schedule)
       .then((response) => {
         close();
+        notifySuccess("Dados alterados com sucesso!");
         console.log(response);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => notifyError(error));
   }
 }
 </script>

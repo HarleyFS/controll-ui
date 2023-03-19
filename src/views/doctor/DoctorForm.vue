@@ -163,6 +163,8 @@ import type Doctor from "@/interfaces/doctor/IDoctor";
 import DoctorService from "@/services/DoctorService";
 import { Speciality } from "@/enums/SpecialityEnum";
 import { Gender } from "@/enums/GenderEnum";
+import useNotifierHook from "@/hooks/notifier-hook";
+
 const doctor = reactive<Doctor>({
   id: null,
   name: "",
@@ -214,14 +216,16 @@ const states = reactive([
   "TO",
 ]);
 
+const { notifySuccess, notifyError } = useNotifierHook();
+
 function register(): void {
-  console.log(doctor)
   DoctorService.registerDoctor(doctor)
     .then((response) => {
       close();
+      notifySuccess("Doutor cadastrado com sucesso!");
       console.log(response);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => notifyError(error));
 }
 
 const props = defineProps({

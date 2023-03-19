@@ -52,6 +52,7 @@ import type Login from "@/interfaces/authentication/ILogin";
 import AuthenticationService from "@/services/AuthenticationService";
 import { userStore } from "@/stores/user-store";
 import router from "@/router";
+import useNotifierHook from "@/hooks/notifier-hook";
 
 const user = ref<Login>({
   email: "",
@@ -59,6 +60,7 @@ const user = ref<Login>({
 });
 
 const store = userStore();
+const { notifyError } = useNotifierHook();
 
 const authenticate = (): void => {
   AuthenticationService.authenticate(user.value)
@@ -66,7 +68,7 @@ const authenticate = (): void => {
       store.storeToken(response.data.token);
       router.push({ name: "dashboard" });
     })
-    .catch((error) => console.log(error));
+    .catch((error) => notifyError(error));
 };
 </script>
 
