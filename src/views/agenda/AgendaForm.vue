@@ -57,7 +57,7 @@
 
         <CardInput inputSize="is-3" nameLabel="Horário">
           <div class="custom-label">
-            {{ schedule.scheduleDate.toLocaleString().replace(",", "  ") }}
+            {{ scheduleDate.toLocaleString().replace(",", "  ") }}
           </div>
         </CardInput>
       </div>

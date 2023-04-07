@@ -113,16 +113,16 @@ const hours = ref(Array.from({ length: 17 }, (_, i) => i + 7));
 const minutes = ref(Array.from({ length: 6 }, (_, i) => (i *= 10)));
 
 const calendarDate = ref(new Date());
-const boardDate = ref(new Date());
 
 function getName(hour: number, minute: number) {
   if (hour != null && minute != null) {
     var name = null;
     scheduleList.value.forEach((element) => {
-      boardDate.value.setHours(hour, minute, 0, 0);
+      const boardDate = new Date(calendarDate.value);
+      boardDate.setHours(hour, minute, 0, 0);
       const scheduleDate = new Date(element.scheduleDate);
 
-      if (boardDate.value.getTime() == scheduleDate.getTime()) {
+      if (boardDate.getTime() == scheduleDate.getTime()) {
         name = element.fullName;
       }
     });
@@ -137,6 +137,7 @@ const renderModal = (hours: any) => {
   if (hours != null) {
     calendarDate.value.setHours(hours.hour, hours.minute, 0, 0);
   }
+  console.log(calendarDate)
   render.value = !render.value;
 };
 </script>
