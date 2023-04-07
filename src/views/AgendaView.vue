@@ -7,8 +7,26 @@
             <p id="agenda" class="title">Agenda</p>
           </div>
           <div class="body-agenda">
-            <span v-for="(i, index) of list" :key="index">
-              <CardTimeComponent :hour="i" @openForm="renderModal()" />
+            <span v-for="(hour, index) of hours" :key="index">
+              <div
+                class="tile is-ancestor card-ancestor"
+                :class="currentHour == hour ? 'shadow' : ''"
+              >
+                <div class="tile is-parent">
+                  <article
+                    v-for="(minute, index) in minutes"
+                    :key="index"
+                    class="tile is-child box card-child"
+                    :class="currentHour == hour ? 'shadow' : ''">
+                    <Time
+                      :patient="getName(hour, minute)"
+                      @openForm="renderModal"
+                      :hour="hour"
+                      :minutes="minute"
+                    ></Time>
+                  </article>
+                </div>
+              </div>
             </span>
           </div>
         </article>
@@ -18,7 +36,7 @@
     <div class="tile is-parent is-vertical">
       <article class="tile is-child card-calender">
         <p id="calendar" class="title">Calendário</p>
-        <DatePicker v-model="date" style="width: 100%" />
+        <DatePicker v-model="calendarDate" style="width: 100%" />
       </article>
 
       <article class="tile is-child box">
@@ -66,27 +84,59 @@
       </article>
     </div>
   </div>
-  <AgendaForm :render="render" @closeForm="renderModal()" />
+  <AgendaForm :scheduleDate="calendarDate" :render="render" @closeForm="renderModal" />
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useScheduleStore } from "@/stores/schedule-store";
 import { DatePicker } from "v-calendar";
-import CardTimeComponent from "@/components/CardTimeComponent.vue";
 import AgendaForm from "./agenda/AgendaForm.vue";
+import Time from "@/components/TimeComponent.vue";
+import ScheduleService from "@/services/ScheduleService";
 
-const render = ref(true);
-const schedueleStore = useScheduleStore();
 
-const date = ref(new Date());
-const begin = ref(7);
-const final = ref(24);
-const list = ref(
-  Array.from({ length: final.value - begin.value }, (_, i) => i + 6 + 1)
-);
+const scheduleStore = useScheduleStore();
+const scheduleList = ref<Array<any>>([]);
 
-const renderModal = () => {
+onMounted(async () => {
+  await scheduleStore.getScheduleList();
+  scheduleList.value = scheduleStore.scheduleList;
+});
+
+ScheduleService.getScheduleList().then((response) => {
+  scheduleList.value = response.data.content;
+});
+
+const currentHour = ref(new Date().getHours());
+const hours = ref(Array.from({ length: 17 }, (_, i) => i + 7));
+const minutes = ref(Array.from({ length: 6 }, (_, i) => (i *= 10)));
+
+const calendarDate = ref(new Date());
+const boardDate = ref(new Date());
+
+function getName(hour: number, minute: number) {
+  if (hour != null && minute != null) {
+    var name = null;
+    scheduleList.value.forEach((element) => {
+      boardDate.value.setHours(hour, minute, 0, 0);
+      const scheduleDate = new Date(element.scheduleDate);
+
+      if (boardDate.value.getTime() == scheduleDate.getTime()) {
+        name = element.fullName;
+      }
+    });
+  }
+
+  return name;
+}
+
+
+const render = ref(false);
+const renderModal = (hours: any) => {
+  if (hours != null) {
+    calendarDate.value.setHours(hours.hour, hours.minute, 0, 0);
+  }
   render.value = !render.value;
 };
 </script>
@@ -152,5 +202,25 @@ const renderModal = () => {
 /* -------------------------- DOCTOR DATA -------------------------- */
 .box {
   background-color: #e9fffeeb;
+}
+
+.card-ancestor {
+  margin: 0px 0px 0 0 !important;
+  background-color: var(--light);
+  border-block: 1px solid #e4e4e4;
+}
+
+.card-ancestor.shadow {
+  background-color: #b0f7f3eb;
+}
+
+.card-child {
+  padding: 0;
+  box-shadow: none;
+  background-color: var(--light);
+}
+
+.card-child.shadow {
+  background-color: #b0f7f3eb;
 }
 </style>

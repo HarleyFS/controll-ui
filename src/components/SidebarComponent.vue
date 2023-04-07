@@ -92,7 +92,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const isExpanded = ref(true);
+    const isExpanded = ref(false);
 
     const expand = () => {
       isExpanded.value = !isExpanded.value;

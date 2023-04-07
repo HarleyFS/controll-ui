@@ -54,6 +54,12 @@
             v-model="schedule.cellNumber"
           />
         </CardInput>
+
+        <CardInput inputSize="is-3" nameLabel="Horário">
+          <div class="custom-label">
+            {{ schedule.scheduleDate.toLocaleString().replace(",", "  ") }}
+          </div>
+        </CardInput>
       </div>
     </template>
 
@@ -81,6 +87,14 @@ import type Schedule from "@/interfaces/schedule/IScheduleCreate";
 import { Gender } from "@/enums/GenderEnum";
 import { reactive } from "vue";
 import useNotifierHook from "@/hooks/notifier-hook";
+const props = defineProps({
+  render: Boolean,
+  id: Number,
+  scheduleDate: {
+    type: Date,
+    default: null,
+  },
+});
 
 const schedule = reactive<Schedule>({
   id: null,
@@ -88,15 +102,10 @@ const schedule = reactive<Schedule>({
   gender: Gender.FEMALE,
   cellNumber: "",
   birthDate: new Date(),
-  scheduleDate: new Date(),
+  scheduleDate: props.scheduleDate,
 });
 
 const { notifySuccess, notifyError } = useNotifierHook();
-
-const props = defineProps({
-  render: Boolean,
-  id: Number,
-});
 
 const emit = defineEmits(["closeForm"]);
 
@@ -107,10 +116,9 @@ function close(): void {
 function create(): void {
   console.log(schedule);
   ScheduleService.createSchedule(schedule)
-    .then((response) => {
+    .then(() => {
       close();
       notifySuccess("Consulta agendada com sucesso!");
-      console.log(response);
     })
     .catch((error) => notifyError(error));
 }
@@ -118,10 +126,9 @@ function create(): void {
 function update(): void {
   if (props.id) {
     ScheduleService.updateSchedule(props.id, schedule)
-      .then((response) => {
+      .then(() => {
         close();
         notifySuccess("Dados alterados com sucesso!");
-        console.log(response);
       })
       .catch((error) => notifyError(error));
   }
@@ -157,5 +164,13 @@ p,
 
 .modal-background {
   background-color: rgb(197 230 236 / 80%);
+}
+
+.custom-label {
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #363636;
+  padding: 7px 11px;
 }
 </style>
