@@ -1,5 +1,5 @@
 import httpClient from "@/http";
-import type Schedule from "@/interfaces/schedule/IScheduleCreate";
+import type Schedule from "@/interfaces/schedule/IScheduleRegister";
 
 class ScheduleService {
   public createSchedule(schedule: Schedule): Promise<any> {

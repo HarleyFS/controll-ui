@@ -17,9 +17,10 @@
                     v-for="(minute, index) in minutes"
                     :key="index"
                     class="tile is-child box card-child"
-                    :class="currentHour == hour ? 'shadow' : ''">
+                    :class="currentHour == hour ? 'shadow' : ''"
+                  >
                     <Time
-                      :patient="getName(hour, minute)"
+                      :schedule="getSchedule(hour, minute)"
                       @openForm="renderModal"
                       :hour="hour"
                       :minutes="minute"
@@ -84,7 +85,12 @@
       </article>
     </div>
   </div>
-  <AgendaForm :scheduleDate="calendarDate" :render="render" @closeForm="renderModal" />
+  <AgendaForm
+    :schedule="schedule"
+    :scheduleDate="calendarDate"
+    :render="render"
+    @closeForm="renderModal"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -94,7 +100,7 @@ import { DatePicker } from "v-calendar";
 import AgendaForm from "./agenda/AgendaForm.vue";
 import Time from "@/components/TimeComponent.vue";
 import ScheduleService from "@/services/ScheduleService";
-
+import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 
 const scheduleStore = useScheduleStore();
 const scheduleList = ref<Array<any>>([]);
@@ -113,8 +119,9 @@ const hours = ref(Array.from({ length: 17 }, (_, i) => i + 7));
 const minutes = ref(Array.from({ length: 6 }, (_, i) => (i *= 10)));
 
 const calendarDate = ref(new Date());
+let schedule = ref<ISchedule>();
 
-function getName(hour: number, minute: number) {
+function getSchedule(hour: number, minute: number) {
   if (hour != null && minute != null) {
     var name = null;
     scheduleList.value.forEach((element) => {
@@ -123,7 +130,7 @@ function getName(hour: number, minute: number) {
       const scheduleDate = new Date(element.scheduleDate);
 
       if (boardDate.getTime() == scheduleDate.getTime()) {
-        name = element.fullName;
+        name = element;
       }
     });
   }
@@ -131,13 +138,12 @@ function getName(hour: number, minute: number) {
   return name;
 }
 
-
 const render = ref(false);
 const renderModal = (hours: any) => {
   if (hours != null) {
     calendarDate.value.setHours(hours.hour, hours.minute, 0, 0);
+    schedule.value = hours.schedule;
   }
-  console.log(calendarDate)
   render.value = !render.value;
 };
 </script>

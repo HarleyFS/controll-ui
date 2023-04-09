@@ -1,12 +1,20 @@
 <template>
   <p class="title">
     {{ props.hour }}:{{ props.minutes == 0 ? "00" : props.minutes }}
-    <i class="fa-solid fa-circle-plus" @click="open()"></i>
+    <i
+      v-if="!props.schedule?.fullName"
+      class="fa-solid fa-circle-plus"
+      @click="open()"
+    ></i>
+    <i v-else @click="open()"></i>
   </p>
-  <p class="subtitle" @click="open()">{{ props.patient }}</p>
+  <p class="subtitle" style="padding: 1px 4px 1px 4px;" @click="open()">{{ props.schedule?.fullName }}</p>
 </template>
 
 <script lang="ts" setup>
+import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
+import type { PropType } from "vue";
+
 const props = defineProps({
   hour: {
     type: Number,
@@ -16,18 +24,22 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  patient: {
-    type: String,
+  schedule: {
+    type: Object as PropType<ISchedule>,
     default: null,
   },
 });
 
 const emit = defineEmits<{
-  (e: "openForm", hours: any): void;
+  (e: "openForm", schedule: any): void;
 }>();
 
 function open(): void {
-  emit("openForm", { hour: props.hour, minute: props.minutes });
+  emit("openForm", {
+    hour: props.hour,
+    minute: props.minutes,
+    schedule: props.schedule,
+  });
 }
 </script>
 
@@ -35,6 +47,7 @@ function open(): void {
 i {
   position: relative;
   margin-left: 0.25rem;
+  cursor: pointer;
 }
 
 p.title {
@@ -47,7 +60,7 @@ p.subtitle {
   background-color: var(--primary);
   color: var(--light) !important;
   border-radius: 8px;
-  padding: 1px 3px 1px 3px;
   margin-right: 8px;
+  cursor: pointer;
 }
 </style>

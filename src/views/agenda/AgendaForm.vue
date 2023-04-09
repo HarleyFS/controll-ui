@@ -64,15 +64,21 @@
     </template>
 
     <template v-slot:footer>
-      <button class="button button-person" @click="create()" v-if="!id">
+      <button
+        class="button button-person"
+        @click="create()"
+        v-if="!schedule.id"
+      >
         Salvar
       </button>
-      <button class="button" @click="close()" v-if="!id">Voltar</button>
-
-      <button class="button button-person" @click="update()" v-if="id">
-        Editar
+      <button class="button" @click="close()" v-if="!schedule.id">
+        Voltar
       </button>
-      <button class="button is-danger" @click="close()" v-if="id">
+
+      <button class="button button-person" @click="update()" v-if="schedule.id">
+        Atualizar
+      </button>
+      <button class="button is-danger" @click="close()" v-if="schedule.id">
         Cancelar
       </button>
     </template>
@@ -83,10 +89,11 @@
 import ModalComponent from "@/components/ModalComponent.vue";
 import CardInput from "@/components/CardInputComponent.vue";
 import ScheduleService from "@/services/ScheduleService";
-import type Schedule from "@/interfaces/schedule/IScheduleCreate";
+import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import { Gender } from "@/enums/GenderEnum";
-import { reactive } from "vue";
+import { reactive, type PropType, watch } from "vue";
 import useNotifierHook from "@/hooks/notifier-hook";
+
 const props = defineProps({
   render: Boolean,
   id: Number,
@@ -94,16 +101,38 @@ const props = defineProps({
     type: Date,
     default: null,
   },
+  schedule: {
+    type: Object as PropType<ISchedule>,
+    default: null,
+  },
 });
 
-const schedule = reactive<Schedule>({
+let schedule = reactive<ISchedule>({
   id: null,
-  fullName: "",
+  fullName: props.schedule?.fullName,
   gender: Gender.FEMALE,
   cellNumber: "",
   birthDate: new Date(),
   scheduleDate: props.scheduleDate,
 });
+
+watch(
+  () => props.schedule,
+  (newValue) => {
+    if (newValue != null && newValue.id != null) {
+      schedule = newValue;
+    } else {
+      schedule = reactive<ISchedule>({
+        id: null,
+        fullName: props.schedule?.fullName,
+        gender: Gender.FEMALE,
+        cellNumber: "",
+        birthDate: new Date(),
+        scheduleDate: props.scheduleDate,
+      });
+    }
+  }
+);
 
 const { notifySuccess, notifyError } = useNotifierHook();
 
@@ -114,7 +143,7 @@ function close(): void {
 }
 
 function create(): void {
-  console.log(schedule);
+  console.log(schedule)
   ScheduleService.createSchedule(schedule)
     .then(() => {
       close();
@@ -124,13 +153,15 @@ function create(): void {
 }
 
 function update(): void {
-  if (props.id) {
-    ScheduleService.updateSchedule(props.id, schedule)
+  if (schedule.id) {
+    ScheduleService.updateSchedule(schedule.id, schedule)
       .then(() => {
         close();
         notifySuccess("Dados alterados com sucesso!");
       })
       .catch((error) => notifyError(error));
+  } else {
+    notifySuccess("Ocorreu um erro, tente mais tarde.");
   }
 }
 </script>
