@@ -59,9 +59,9 @@
           <div class="media-content" style="margin-top: 1rem">
             <div class="content">
               <p>
-                <strong>Dra. Mariana Barbosa</strong>
+                <strong>{{ doctor?.name }}</strong>
                 <br />
-                Clínico Geral
+                {{ doctor?.specialty }}
               </p>
             </div>
           </div>
@@ -101,13 +101,19 @@ import AgendaForm from "./agenda/AgendaForm.vue";
 import Time from "@/components/TimeComponent.vue";
 import ScheduleService from "@/services/ScheduleService";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
+import type IDoctor from "@/interfaces/doctor/IDoctorList";
+import { useDoctorStore } from "@/stores/doctor-store";
 
 const scheduleStore = useScheduleStore();
 const scheduleList = ref<Array<any>>([]);
+const doctorStore = useDoctorStore();
+const doctor = ref<IDoctor>();
 
 onMounted(async () => {
   await scheduleStore.getScheduleList();
   scheduleList.value = scheduleStore.scheduleList;
+  await doctorStore.getDoctorList();
+  doctorStore.setCurrentDoctor(doctorStore.doctorList[0]);
 });
 
 ScheduleService.getScheduleList().then((response) => {
@@ -143,6 +149,7 @@ const renderModal = (hours: any) => {
   if (hours != null) {
     calendarDate.value.setHours(hours.hour, hours.minute, 0, 0);
     schedule.value = hours.schedule;
+    doctorStore.setCurrentDoctor(doctorStore.doctorList[0]);
   }
   render.value = !render.value;
 };

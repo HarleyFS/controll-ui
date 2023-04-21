@@ -54,6 +54,13 @@
             v-model="schedule.cellNumber"
           />
         </CardInput>
+      </div>
+      <div class="columns">
+        <CardInput inputSize="is-3" nameLabel="Doutor(a)">
+          <div class="custom-label">
+            {{ doctor?.name }}
+          </div>
+        </CardInput>
 
         <CardInput inputSize="is-3" nameLabel="Horário">
           <div class="custom-label">
@@ -93,6 +100,8 @@ import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import { Gender } from "@/enums/GenderEnum";
 import { reactive, type PropType, watch } from "vue";
 import useNotifierHook from "@/hooks/notifier-hook";
+import { useDoctorStore } from "@/stores/doctor-store";
+const doctorStore = useDoctorStore();
 
 const props = defineProps({
   render: Boolean,
@@ -107,6 +116,7 @@ const props = defineProps({
   },
 });
 
+const doctor = doctorStore.getCurrentDoctor;
 let schedule = reactive<ISchedule>({
   id: null,
   fullName: props.schedule?.fullName,
@@ -114,6 +124,7 @@ let schedule = reactive<ISchedule>({
   cellNumber: "",
   birthDate: new Date(),
   scheduleDate: props.scheduleDate,
+  doctor: doctor.value,
 });
 
 watch(
@@ -129,6 +140,7 @@ watch(
         cellNumber: "",
         birthDate: new Date(),
         scheduleDate: props.scheduleDate,
+        doctor: doctor.value,
       });
     }
   }
@@ -143,7 +155,7 @@ function close(): void {
 }
 
 function create(): void {
-  console.log(schedule)
+  schedule.doctor = doctorStore.getCurrentDoctor.value;
   ScheduleService.createSchedule(schedule)
     .then(() => {
       close();

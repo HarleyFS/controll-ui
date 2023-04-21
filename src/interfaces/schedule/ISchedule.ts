@@ -1,4 +1,5 @@
 import type { Gender } from "@/enums/GenderEnum";
+import type IDoctor from "@/interfaces/doctor/IDoctorList";
 
 export default interface ISchedule {
   id: Number;
@@ -8,4 +9,5 @@ export default interface ISchedule {
   birthDate: Date;
   scheduleDate: Date;
   gender: Gender;
+  doctor: IDoctor;
 }
