@@ -41,18 +41,24 @@
       </tbody>
     </table>
 
-    <PaginationComponent></PaginationComponent>
+    <PaginationComponent
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :onPageChange="onPageChange"
+      :totalElements="totalElements"
+    ></PaginationComponent>
   </section>
 
   <PacientForm :render="render" @closeForm="renderModal()"></PacientForm>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import PacientForm from "@/views/patient/PatientForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import { usePatientStore } from "@/stores/patient-store";
 import type Patient from "@/interfaces/patient/IPatientList";
+import PatientService from "@/services/PatientService";
 
 export default defineComponent({
   name: "PacientView",
@@ -66,19 +72,38 @@ export default defineComponent({
     const patientStore = usePatientStore();
     const patientList = ref<Array<Patient>>([]);
 
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const totalElements = ref(0);
+
     const renderModal = () => {
       render.value = !render.value;
     };
 
-    onMounted(async () => {
-      await patientStore.getPatientList();
-      patientList.value = patientStore.patientList;
-    });
+    const loadItems = async (page: number) => {
+      await PatientService.getPatientList(page).then((response) => {
+        patientList.value = response.data.content;
+        totalPages.value = response.data.totalPages;
+        totalElements.value = response.data.totalElements;
+        patientStore.setPatientList(patientList.value);
+      });
+    };
+
+    const onPageChange = (page: number) => {
+      currentPage.value = page;
+      loadItems(page);
+    };
+
+    loadItems(currentPage.value);
 
     return {
       render,
       renderModal,
       patientList,
+      currentPage,
+      totalPages,
+      onPageChange,
+      totalElements,
     };
   },
 });

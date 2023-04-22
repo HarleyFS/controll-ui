@@ -6,11 +6,9 @@ import PatientService from "@/services/PatientService";
 export const usePatientStore = defineStore("patient", () => {
   const patientList = ref<Array<Patient>>([]);
 
-  async function getPatientList() {
-    await PatientService.getPatientList().then(
-      (reponse) => (patientList.value = reponse.data.content)
-    );
+  async function setPatientList(list: Array<Patient>) {
+    patientList.value = list;
   }
 
-  return { patientList, getPatientList };
+  return { patientList, setPatientList };
 });
