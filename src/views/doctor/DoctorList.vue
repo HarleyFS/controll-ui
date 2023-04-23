@@ -39,7 +39,12 @@
       </tbody>
     </table>
 
-    <PaginationComponent></PaginationComponent>
+    <PaginationComponent
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :onPageChange="onPageChange"
+      :totalElements="totalElements"
+    ></PaginationComponent>
   </section>
 
   <DoctorForm :render="render" @closeForm="renderModal()"></DoctorForm>
@@ -51,6 +56,7 @@ import DoctorForm from "@/views/doctor/DoctorForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import { useDoctorStore } from "@/stores/doctor-store";
 import type Doctor from "@/interfaces/doctor/IDoctorList";
+import DoctorService from "@/services/DoctorService";
 
 export default defineComponent({
   name: "PacientView",
@@ -66,17 +72,37 @@ export default defineComponent({
 
     const renderModal = () => {
       render.value = !render.value;
+      loadItems(1);
     };
 
-    onMounted(async () => {
-      await doctorStore.getDoctorList();
-      doctorList.value = doctorStore.doctorList;
-    });
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const totalElements = ref(0);
+
+    const loadItems = async (page: number) => {
+      await DoctorService.getDoctorList(page).then((response) => {
+        doctorList.value = response.data.content;
+        totalPages.value = response.data.totalPages;
+        totalElements.value = response.data.totalElements;
+        doctorStore.doctorList = doctorList.value;
+      });
+    };
+
+    const onPageChange = (page: number) => {
+      currentPage.value = page;
+      loadItems(page);
+    };
+
+    loadItems(currentPage.value);
 
     return {
       render,
       renderModal,
       doctorList,
+      currentPage,
+      totalPages,
+      onPageChange,
+      totalElements,
     };
   },
 });

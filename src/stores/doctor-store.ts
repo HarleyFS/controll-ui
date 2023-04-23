@@ -9,7 +9,7 @@ export const useDoctorStore = defineStore("doctor", () => {
   const totalDoctors = ref(2);
 
   async function getDoctorList() {
-    await DoctorService.getDoctorListAll().then(
+    await DoctorService.getOneDoctorList().then(
       (reponse) => (doctorList.value = reponse.data.content)
     );
   }

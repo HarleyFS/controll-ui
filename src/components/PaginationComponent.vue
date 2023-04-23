@@ -1,5 +1,10 @@
 <template>
-  <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+  <nav
+    v-if="totalElements > 10"
+    class="pagination is-rounded"
+    role="navigation"
+    aria-label="pagination"
+  >
     <ul class="pagination-list">
       <li>
         <a
@@ -57,7 +62,7 @@ export default defineComponent({
   },
 
   data() {
-    return { visiblePages: [1, 2, 3] };
+    return { visiblePages: this.totalElements < 21 ? [1, 2] : [1, 2, 3] };
   },
 
   methods: {

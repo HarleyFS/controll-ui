@@ -78,6 +78,8 @@ export default defineComponent({
 
     const renderModal = () => {
       render.value = !render.value;
+      currentPage.value = 1;
+      loadItems(1);
     };
 
     const loadItems = async (page: number) => {

@@ -75,14 +75,7 @@
           <div class="level-item has-text-centered">
             <div class="box">
               <p class="heading">Consultas Agendadas</p>
-              <p class="title">300</p>
-            </div>
-          </div>
-
-          <div class="level-item has-text-centered">
-            <div class="box">
-              <p class="heading">Horários disponíveis</p>
-              <p class="title">134</p>
+              <p class="title">{{ scheduleList.length }}</p>
             </div>
           </div>
         </div>
@@ -115,6 +108,7 @@ const doctorStore = useDoctorStore();
 const doctor = ref<IDoctor>();
 
 onMounted(async () => {
+  getCurrentDoctor(0);
   await scheduleStore.getScheduleList();
   scheduleList.value = scheduleStore.scheduleList;
   await doctorStore.getDoctorList();
@@ -170,7 +164,7 @@ function goToNextPage() {
 }
 
 async function getCurrentDoctor(page: number) {
-  await DoctorService.getDoctorList(page).then((response) => {
+  await DoctorService.getOneDoctorList(page).then((response) => {
     doctor.value = response.data.content[0];
     if (doctor.value != null && doctor.value != undefined) {
       doctorStore.setCurrentDoctor(doctor.value);
@@ -187,6 +181,7 @@ const renderModal = (hours: any) => {
     schedule.value = hours.schedule;
   }
   render.value = !render.value;
+  getScheduleList();
 };
 </script>
 
