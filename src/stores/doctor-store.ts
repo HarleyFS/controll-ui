@@ -6,9 +6,10 @@ import DoctorService from "@/services/DoctorService";
 export const useDoctorStore = defineStore("doctor", () => {
   const doctorList = ref<Array<Doctor>>([]);
   const currentDoctor = ref<Doctor>();
+  const totalDoctors = ref(2);
 
   async function getDoctorList() {
-    await DoctorService.getDoctorList().then(
+    await DoctorService.getDoctorListAll().then(
       (reponse) => (doctorList.value = reponse.data.content)
     );
   }
@@ -25,5 +26,6 @@ export const useDoctorStore = defineStore("doctor", () => {
     getDoctorList,
     setCurrentDoctor,
     getCurrentDoctor,
+    totalDoctors,
   };
 });

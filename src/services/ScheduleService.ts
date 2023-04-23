@@ -10,8 +10,8 @@ class ScheduleService {
     return httpClient.get(`/schedule/${id}`);
   }
 
-  public getScheduleList(): Promise<any> {
-    return httpClient.get("/schedule");
+  public getScheduleList(doctorId: Number): Promise<any> {
+    return httpClient.get(`/schedule?doctorId=${doctorId}`);
   }
 
   public deleteScheduleById(id: Number): Promise<any> {

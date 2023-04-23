@@ -7,9 +7,9 @@ export const useScheduleStore = defineStore("schedule", () => {
   const scheduleList = ref<Array<Schedule>>([]);
 
   async function getScheduleList() {
-    await ScheduleService.getScheduleList().then(
-      (reponse) => (scheduleList.value = reponse.data.content)
-    );
+    //await ScheduleService.getScheduleList().then(
+    //  (reponse) => (scheduleList.value = reponse.data.content)
+    //);
   }
 
   return { scheduleList, getScheduleList };

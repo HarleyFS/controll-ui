@@ -43,11 +43,15 @@
       <article class="tile is-child box">
         <div class="level">
           <div class="level-left">
-            <i class="fas fa-angle-left"></i>
+            <a @click="goToPreviousPage()">
+              <i class="fas fa-angle-left"></i>
+            </a>
           </div>
 
           <div class="level-right">
-            <i class="fas fa-angle-right"></i>
+            <a @click="goToNextPage()">
+              <i class="fas fa-angle-right"></i>
+            </a>
           </div>
         </div>
 
@@ -103,6 +107,7 @@ import ScheduleService from "@/services/ScheduleService";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import type IDoctor from "@/interfaces/doctor/IDoctorList";
 import { useDoctorStore } from "@/stores/doctor-store";
+import DoctorService from "@/services/DoctorService";
 
 const scheduleStore = useScheduleStore();
 const scheduleList = ref<Array<any>>([]);
@@ -116,9 +121,13 @@ onMounted(async () => {
   doctorStore.setCurrentDoctor(doctorStore.doctorList[0]);
 });
 
-ScheduleService.getScheduleList().then((response) => {
-  scheduleList.value = response.data.content;
-});
+async function getScheduleList() {
+  if (doctor.value != null && doctor.value.id != null) {
+    await ScheduleService.getScheduleList(doctor.value.id).then((reponse) => {
+      scheduleList.value = reponse.data.content;
+    });
+  }
+}
 
 const currentHour = ref(new Date().getHours());
 const hours = ref(Array.from({ length: 17 }, (_, i) => i + 7));
@@ -144,12 +153,38 @@ function getSchedule(hour: number, minute: number) {
   return name;
 }
 
+let currentPage = 0;
+
+function goToPreviousPage() {
+  if (currentPage - 1 > -1) {
+    currentPage -= 1;
+    getCurrentDoctor(currentPage);
+  }
+}
+
+function goToNextPage() {
+  if (currentPage + 1 < doctorStore.totalDoctors) {
+    currentPage += 1;
+    getCurrentDoctor(currentPage);
+  }
+}
+
+async function getCurrentDoctor(page: number) {
+  await DoctorService.getDoctorList(page).then((response) => {
+    doctor.value = response.data.content[0];
+    if (doctor.value != null && doctor.value != undefined) {
+      doctorStore.setCurrentDoctor(doctor.value);
+      doctorStore.currentDoctor = doctor.value;
+      getScheduleList();
+    }
+  });
+}
+
 const render = ref(false);
 const renderModal = (hours: any) => {
   if (hours != null) {
     calendarDate.value.setHours(hours.hour, hours.minute, 0, 0);
     schedule.value = hours.schedule;
-    doctorStore.setCurrentDoctor(doctorStore.doctorList[0]);
   }
   render.value = !render.value;
 };
