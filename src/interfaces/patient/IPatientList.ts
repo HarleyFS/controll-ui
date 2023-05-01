@@ -5,7 +5,7 @@ export default interface IPatientList {
   name: String;
   lastName: String;
   cellNumber: String;
-  birthDate: String;
+  age: number;
   gender: Gender;
   email: String;
 }

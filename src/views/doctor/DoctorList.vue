@@ -6,7 +6,7 @@
           <i style="margin-right: 0.5rem" class="fas fa-plus"></i>Novo
         </button>
       </div>
-      <div class="column is-3">
+      <div class="column is-3" v-if="false">
         <div class="field">
           <p class="control has-icons-left">
             <input class="input search" type="text" placeholder="Filtro" />

@@ -9,7 +9,12 @@
       <div class="column is-3">
         <div class="field">
           <p class="control has-icons-left">
-            <input class="input search" type="text" placeholder="Filtro" />
+            <input
+              class="input search"
+              type="text"
+              placeholder="Filtro"
+              v-model="patientFilter"
+            />
             <span class="icon is-small is-left">
               <i class="fas fa-search search"></i>
             </span>
@@ -34,7 +39,7 @@
           <td>{{ patient.name }}</td>
           <td>{{ patient.lastName }}</td>
           <td>{{ patient.cellNumber }}</td>
-          <td>{{ patient.birthDate }}</td>
+          <td>{{ patient.age }} anos</td>
           <td>{{ patient.gender }}</td>
           <td>{{ patient.email }}</td>
         </tr>
@@ -53,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watchEffect, reactive } from "vue";
 import PacientForm from "@/views/patient/PatientForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import { usePatientStore } from "@/stores/patient-store";
@@ -68,6 +73,7 @@ export default defineComponent({
   },
 
   setup() {
+    const patientFilter = ref("");
     const render = ref(false);
     const patientStore = usePatientStore();
     const patientList = ref<Array<Patient>>([]);
@@ -79,24 +85,30 @@ export default defineComponent({
     const renderModal = () => {
       render.value = !render.value;
       currentPage.value = 1;
-      loadItems(1);
+      loadPatientList(1);
     };
 
-    const loadItems = async (page: number) => {
-      await PatientService.getPatientList(page).then((response) => {
-        patientList.value = response.data.content;
-        totalPages.value = response.data.totalPages;
-        totalElements.value = response.data.totalElements;
-        patientStore.setPatientList(patientList.value);
-      });
-    };
+    async function loadPatientList(page: number) {
+      await PatientService.getPatientList(page, patientFilter.value).then(
+        (response) => {
+          patientList.value = response.data.content;
+          totalPages.value = response.data.totalPages;
+          totalElements.value = response.data.totalElements;
+          patientStore.setPatientList(patientList.value);
+        }
+      );
+    }
+
+    loadPatientList(currentPage.value);
 
     const onPageChange = (page: number) => {
       currentPage.value = page;
-      loadItems(page);
+      loadPatientList(page);
     };
 
-    loadItems(currentPage.value);
+    watchEffect(() => {
+      loadPatientList(currentPage.value);
+    });
 
     return {
       render,
@@ -106,6 +118,7 @@ export default defineComponent({
       totalPages,
       onPageChange,
       totalElements,
+      patientFilter,
     };
   },
 });

@@ -10,9 +10,12 @@ class PatientService {
     return httpClient.get(`/patient/${id}`);
   }
 
-  public getPatientList(page: number): Promise<any> {
+  public getPatientList(page: number, filter: String): Promise<any> {
     page -= 1;
-    return httpClient.get(`/patient?page=${page}`);
+    return httpClient.post(
+      `/patient/search?filter=${filter}&page=${page}`,
+      filter
+    );
   }
 
   public deletePatientById(id: Number): Promise<any> {
