@@ -31,6 +31,7 @@
           <th>Idade</th>
           <th>Genero</th>
           <th>Email</th>
+          <th></th>
         </tr>
       </thead>
 
@@ -42,6 +43,12 @@
           <td>{{ patient.age }} anos</td>
           <td>{{ patient.gender }}</td>
           <td>{{ patient.email }}</td>
+          <td>
+            <i
+              class="fa-solid fa-eye"
+              @click="renderModal2(Number(patient.id))"
+            ></i>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -54,7 +61,11 @@
     ></PaginationComponent>
   </section>
 
-  <PacientForm :render="render" @closeForm="renderModal()"></PacientForm>
+  <PacientForm
+    :render="render"
+    :patient="patient"
+    @closeForm="renderModal()"
+  ></PacientForm>
 </template>
 
 <script lang="ts">
@@ -64,6 +75,7 @@ import PaginationComponent from "@/components/PaginationComponent.vue";
 import { usePatientStore } from "@/stores/patient-store";
 import type Patient from "@/interfaces/patient/IPatientList";
 import PatientService from "@/services/PatientService";
+import type IPatient from "@/interfaces/patient/IPatient";
 
 export default defineComponent({
   name: "PacientView",
@@ -77,6 +89,7 @@ export default defineComponent({
     const render = ref(false);
     const patientStore = usePatientStore();
     const patientList = ref<Array<Patient>>([]);
+    const patient = ref<IPatient>();
 
     const currentPage = ref(1);
     const totalPages = ref(1);
@@ -87,6 +100,13 @@ export default defineComponent({
       currentPage.value = 1;
       loadPatientList(1);
     };
+
+    async function renderModal2(id: number) {
+      await PatientService.getById(id).then((response) => {
+        patient.value = response.data;
+        render.value = !render.value;
+      });
+    }
 
     async function loadPatientList(page: number) {
       await PatientService.getPatientList(page, patientFilter.value).then(
@@ -119,6 +139,8 @@ export default defineComponent({
       onPageChange,
       totalElements,
       patientFilter,
+      renderModal2,
+      patient,
     };
   },
 });

@@ -14,6 +14,7 @@
               type="text"
               placeholder="Nome completo"
               v-model="patient.fullName"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -25,6 +26,7 @@
                   name="answer"
                   :value="Gender.MALE"
                   v-model="patient.gender"
+                  :disabled="disableField()"
                 />
                 Masculino
               </label>
@@ -34,6 +36,7 @@
                   name="answer"
                   :value="Gender.FEMALE"
                   v-model="patient.gender"
+                  :disabled="disableField()"
                 />
                 Feminino
               </label>
@@ -43,7 +46,12 @@
 
         <div class="columns">
           <CardInput inputSize="is-3" nameLabel="Data nascimento">
-            <input class="date" type="date" v-model="patient.birthDate" />
+            <input
+              class="date"
+              type="date"
+              v-model="patient.birthDate"
+              :disabled="disableField()"
+            />
           </CardInput>
 
           <CardInput inputSize="is-3" nameLabel="CPF">
@@ -53,6 +61,7 @@
               placeholder="000.000.000-00"
               v-mask="['###.###.###-##', '##.###.###/####-##']"
               v-model="patient.cpf"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -63,6 +72,7 @@
               placeholder="00.000.000-0"
               v-mask="'##.###.###.#'"
               v-model="patient.rg"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -72,6 +82,7 @@
               type="text"
               placeholder=""
               v-model="patient.healthPlanNumber"
+              :disabled="disableField()"
           /></CardInput>
         </div>
 
@@ -83,6 +94,7 @@
                 type="email"
                 placeholder="E-mail"
                 v-model="patient.email"
+                :disabled="disableField()"
               />
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope"></i>
@@ -97,6 +109,7 @@
               v-mask="['(##) ####-####', '(##) #####-####']"
               placeholder="(00) 00000-0000"
               v-model="patient.phoneNumber"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -107,6 +120,7 @@
               placeholder="(00) 00000-0000"
               v-mask="['(##) ####-####', '(##) #####-####']"
               v-model="patient.cellNumber"
+              :disabled="disableField()"
             />
           </CardInput>
         </div>
@@ -122,6 +136,7 @@
                   placeholder="00000-000"
                   v-mask="'#####-###'"
                   v-model="patient.address.zipCode"
+                  :disabled="disableField()"
                 />
               </div>
             </div>
@@ -133,6 +148,7 @@
               type="text"
               placeholder="Logradouro"
               v-model="patient.address.publicPlace"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -142,6 +158,7 @@
               type="number"
               placeholder="Nº"
               v-model="patient.address.number"
+              :disabled="disableField()"
             />
           </CardInput>
 
@@ -151,6 +168,7 @@
               type="text"
               placeholder="Bairro"
               v-model="patient.address.district"
+              :disabled="disableField()"
             />
           </CardInput>
         </div>
@@ -162,12 +180,16 @@
               type="text"
               placeholder="Cidade"
               v-model="patient.address.city"
+              :disabled="disableField()"
             />
           </CardInput>
 
           <CardInput inputSize="is-2" nameLabel="Estado">
             <div class="select">
-              <select v-model="patient.address.state">
+              <select
+                v-model="patient.address.state"
+                :disabled="disableField()"
+              >
                 <option v-for="state in states" v-bind:key="state">
                   {{ state }}
                 </option>
@@ -181,6 +203,7 @@
               type="text"
               placeholder="Complemento"
               v-model="patient.address.complement"
+              :disabled="disableField()"
             />
           </CardInput>
         </div>
@@ -188,8 +211,30 @@
     </template>
 
     <template v-slot:footer>
-      <button @click="register" class="button button-person">Salvar</button>
-      <button @click="close()" class="button">Cancelar</button>
+      <button
+        @click="register"
+        class="button button-person"
+        v-if="!disableField()"
+      >
+        Salvar
+      </button>
+      <button
+        @click="changePatient(false)"
+        class="button button-cancel"
+        v-if="!disableField()"
+      >
+        Cancelar
+      </button>
+      <button
+        @click="changePatient(true)"
+        class="button button-person"
+        v-if="disableField()"
+      >
+        Editar
+      </button>
+      <button @click="close()" class="button" v-if="disableField()">
+        Voltar
+      </button>
     </template>
   </ModalComponent>
 </template>
@@ -197,13 +242,61 @@
 <script lang="ts" setup>
 import ModalComponent from "@/components/ModalComponent.vue";
 import CardInput from "@/components/CardInputComponent.vue";
-import { reactive } from "vue";
+import { reactive, ref, watch, type PropType } from "vue";
 import type Patient from "@/interfaces/patient/IPatient";
 import PatientService from "@/services/PatientService";
 import { Gender } from "@/enums/GenderEnum";
 import useNotifierHook from "@/hooks/notifier-hook";
 
-const patient = reactive<Patient>({
+const props = defineProps({
+  render: Boolean,
+  patient: Object as PropType<Patient>,
+});
+
+const emit = defineEmits(["closeForm"]);
+
+function close(): void {
+  patient = reactive<Patient>({
+    id: null,
+    fullName: "",
+    gender: Gender.FEMALE,
+    birthDate: new Date(),
+    cpf: "",
+    rg: "",
+    healthInsurance: "",
+    healthPlanNumber: "",
+    email: "",
+    phoneNumber: "",
+    cellNumber: "",
+    address: {
+      publicPlace: "",
+      number: Number(),
+      district: "",
+      city: "",
+      state: "",
+      country: "Brasil",
+      zipCode: "",
+      complement: "",
+    },
+  });
+  edit.value = false;
+  emit("closeForm");
+}
+
+const edit = ref(false);
+function disableField(): boolean {
+  return patient.id && !edit.value ? true : false;
+}
+
+function changePatient(value: boolean): void {
+  edit.value = value;
+  if (!value) {
+    close();
+  }
+}
+
+let patient = reactive<Patient>({
+  id: null,
   fullName: "",
   gender: Gender.FEMALE,
   birthDate: new Date(),
@@ -225,6 +318,15 @@ const patient = reactive<Patient>({
     complement: "",
   },
 });
+
+watch(
+  () => props.patient,
+  (newValue) => {
+    if (newValue != null) {
+      patient = newValue;
+    }
+  }
+);
 
 const states = reactive([
   "AC",
@@ -259,23 +361,23 @@ const states = reactive([
 const { notifySuccess, notifyError } = useNotifierHook();
 
 function register(): void {
-  PatientService.registerPatient(patient)
-    .then((response) => {
-      close();
-      notifySuccess("Paciente cadastrado com sucesso!");
-      console.log(response);
-    })
-    .catch((error) => notifyError(error));
-}
-
-const props = defineProps({
-  render: Boolean,
-});
-
-const emit = defineEmits(["closeForm"]);
-
-function close(): void {
-  emit("closeForm");
+  if (!patient.id) {
+    PatientService.registerPatient(patient)
+      .then((response) => {
+        close();
+        notifySuccess("Paciente cadastrado com sucesso!");
+        console.log(response);
+      })
+      .catch((error) => notifyError(error));
+  } else {
+    PatientService.updatePatient(patient.id, patient)
+      .then((response) => {
+        close();
+        notifySuccess("Paciente cadastrado com sucesso!");
+        console.log(response);
+      })
+      .catch((error) => notifyError(error));
+  }
 }
 </script>
 
@@ -296,11 +398,30 @@ input.date {
   color: #363636;
 }
 
+input.date[disabled] {
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  box-shadow: none;
+  color: #7a7a7a;
+}
+
 .button-person {
   background: var(--primary);
 }
 p,
 .button-person {
+  margin-bottom: 0rem;
+  color: var(--light);
+}
+
+.button-edit {
+  background: #ffe310;
+  margin-bottom: 0rem;
+  color: var(--light);
+}
+
+.button-cancel {
+  background: #ce1515;
   margin-bottom: 0rem;
   color: var(--light);
 }

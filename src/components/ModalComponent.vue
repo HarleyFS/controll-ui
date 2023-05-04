@@ -36,7 +36,7 @@ export default defineComponent({
 }
 
 .modal-card-body {
-  overflow: auto;
+  overflow: visible;
 }
 
 .modal-color,

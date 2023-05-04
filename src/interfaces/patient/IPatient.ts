@@ -2,6 +2,7 @@ import type Address from "@/interfaces/IAdress";
 import type { Gender } from "@/enums/GenderEnum";
 
 export default interface IPatient {
+  id: number | null;
   fullName: String;
   gender: Gender;
   birthDate: Date;
