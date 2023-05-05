@@ -25,6 +25,7 @@
           <th>Especialidade</th>
           <th>CMR</th>
           <th>Email</th>
+          <th></th>
         </tr>
       </thead>
 
@@ -35,6 +36,12 @@
           <td>{{ doctor.specialty }}</td>
           <td>{{ doctor.crm }}</td>
           <td>{{ doctor.email }}</td>
+          <td>
+            <i
+              class="fa-solid fa-eye"
+              @click="renderModal2(Number(doctor.id))"
+            ></i>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -47,7 +54,11 @@
     ></PaginationComponent>
   </section>
 
-  <DoctorForm :render="render" @closeForm="renderModal()"></DoctorForm>
+  <DoctorForm
+    :render="render"
+    @closeForm="renderModal()"
+    :doctor="doctor"
+  ></DoctorForm>
 </template>
 
 <script lang="ts">
@@ -57,6 +68,7 @@ import PaginationComponent from "@/components/PaginationComponent.vue";
 import { useDoctorStore } from "@/stores/doctor-store";
 import type Doctor from "@/interfaces/doctor/IDoctorList";
 import DoctorService from "@/services/DoctorService";
+import type IDoctor from "@/interfaces/doctor/IDoctor";
 
 export default defineComponent({
   name: "PacientView",
@@ -69,11 +81,26 @@ export default defineComponent({
     const render = ref(false);
     const doctorStore = useDoctorStore();
     const doctorList = ref<Array<Doctor>>([]);
-
+    const doctor = ref<IDoctor>();
     const renderModal = () => {
       render.value = !render.value;
       loadItems(1);
     };
+
+    onMounted(() => {
+      doctorStore.getSpecialties();
+    });
+
+    async function renderModal2(id: number) {
+      await DoctorService.getById(id).then((response) => {
+        console.log(
+          "🚀 ~ file: DoctorList.vue:87 ~ awaitDoctorService.getById ~ response:",
+          response
+        );
+        doctor.value = response.data;
+        render.value = !render.value;
+      });
+    }
 
     const currentPage = ref(1);
     const totalPages = ref(1);
@@ -103,6 +130,8 @@ export default defineComponent({
       totalPages,
       onPageChange,
       totalElements,
+      renderModal2,
+      doctor,
     };
   },
 });

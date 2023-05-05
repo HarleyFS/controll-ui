@@ -82,6 +82,7 @@
               type="text"
               placeholder=""
               v-model="patient.healthPlanNumber"
+              v-mask="['################']"
               :disabled="disableField()"
           /></CardInput>
         </div>
@@ -373,7 +374,7 @@ function register(): void {
     PatientService.updatePatient(patient.id, patient)
       .then((response) => {
         close();
-        notifySuccess("Paciente cadastrado com sucesso!");
+        notifySuccess("Paciente atualizado com sucesso!");
         console.log(response);
       })
       .catch((error) => notifyError(error));

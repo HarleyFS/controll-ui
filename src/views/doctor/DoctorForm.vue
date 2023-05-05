@@ -14,6 +14,7 @@
               type="text"
               placeholder="Nome"
               v-model="doctor.name"
+              :disabled="disabledField()"
             />
           </CardInput>
 
@@ -23,6 +24,7 @@
               type="text"
               placeholder="Sobrenome"
               v-model="doctor.lastName"
+              :disabled="disabledField()"
             />
           </CardInput>
 
@@ -33,16 +35,20 @@
               placeholder="000.00"
               v-mask="['###.##']"
               v-model="doctor.crm"
+              :disabled="disabledField()"
             />
           </CardInput>
-
-          <CardInput inputSize="is-3" nameLabel="Especialidades">
-            <input
-              class="input"
-              type="text"
-              placeholder="Especialidade"
-              v-model="doctor.specialty"
-            />
+          <CardInput inputSize="is-4" nameLabel="Especialidades">
+            <div class="select">
+              <select v-model="doctor.specialty" :disabled="disabledField()">
+                <option
+                  v-for="specialty in doctorStore.specialties"
+                  v-bind:key="specialty"
+                >
+                  {{ specialty }}
+                </option>
+              </select>
+            </div>
           </CardInput>
         </div>
 
@@ -54,6 +60,7 @@
                 type="email"
                 placeholder="E-mail"
                 v-model="doctor.email"
+                :disabled="disabledField()"
               />
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope"></i>
@@ -68,6 +75,7 @@
               placeholder="(00) 00000-0000"
               v-mask="['(##) ####-####', '(##) #####-####']"
               v-model="doctor.cellNumber"
+              :disabled="disabledField()"
             />
           </CardInput>
         </div>
@@ -83,6 +91,7 @@
                   placeholder="00000-000"
                   v-mask="'#####-###'"
                   v-model="doctor.address.zipCode"
+                  :disabled="disabledField()"
                 />
               </div>
             </div>
@@ -94,6 +103,7 @@
               type="text"
               placeholder="Logradouro"
               v-model="doctor.address.publicPlace"
+              :disabled="disabledField()"
             />
           </CardInput>
 
@@ -103,6 +113,7 @@
               type="number"
               placeholder="Nº"
               v-model="doctor.address.number"
+              :disabled="disabledField()"
             />
           </CardInput>
 
@@ -112,6 +123,7 @@
               type="text"
               placeholder="Bairro"
               v-model="doctor.address.district"
+              :disabled="disabledField()"
             />
           </CardInput>
         </div>
@@ -123,12 +135,16 @@
               type="text"
               placeholder="Cidade"
               v-model="doctor.address.city"
+              :disabled="disabledField()"
             />
           </CardInput>
 
           <CardInput inputSize="is-2" nameLabel="Estado">
             <div class="select">
-              <select v-model="doctor.address.state">
+              <select
+                v-model="doctor.address.state"
+                :disabled="disabledField()"
+              >
                 <option v-for="state in states" v-bind:key="state">
                   {{ state }}
                 </option>
@@ -142,6 +158,7 @@
               type="text"
               placeholder="Complemento"
               v-model="doctor.address.complement"
+              :disabled="disabledField()"
             />
           </CardInput>
         </div>
@@ -149,8 +166,30 @@
     </template>
 
     <template v-slot:footer>
-      <button @click="register" class="button button-person">Salvar</button>
-      <button @click="close()" class="button">Cancelar</button>
+      <button
+        @click="register"
+        class="button button-person"
+        v-if="!disabledField()"
+      >
+        Salvar
+      </button>
+      <button
+        @click="changeDoctor(false)"
+        class="button button-cancel"
+        v-if="!disabledField()"
+      >
+        Cancelar
+      </button>
+      <button
+        @click="changeDoctor(true)"
+        class="button button-person"
+        v-if="disabledField()"
+      >
+        Editar
+      </button>
+      <button @click="close()" class="button" v-if="disabledField()">
+        Voltar
+      </button>
     </template>
   </ModalComponent>
 </template>
@@ -158,14 +197,20 @@
 <script lang="ts" setup>
 import ModalComponent from "@/components/ModalComponent.vue";
 import CardInput from "@/components/CardInputComponent.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, watch, type PropType } from "vue";
 import type Doctor from "@/interfaces/doctor/IDoctor";
 import DoctorService from "@/services/DoctorService";
-import { Speciality } from "@/enums/SpecialityEnum";
 import { Gender } from "@/enums/GenderEnum";
 import useNotifierHook from "@/hooks/notifier-hook";
+import { useDoctorStore } from "@/stores/doctor-store";
+const doctorStore = useDoctorStore();
 
-const doctor = reactive<Doctor>({
+const props = defineProps({
+  render: Boolean,
+  doctor: Object as PropType<Doctor>,
+});
+
+let doctor = reactive<Doctor>({
   id: null,
   name: "",
   lastName: "",
@@ -185,6 +230,53 @@ const doctor = reactive<Doctor>({
     complement: "",
   },
 });
+
+watch(
+  () => props.doctor,
+  (newValue) => {
+    if (newValue != null) {
+      doctor = newValue;
+    }
+  }
+);
+
+const emit = defineEmits(["closeForm"]);
+function close(): void {
+  doctor = reactive<Doctor>({
+    id: null,
+    name: "",
+    lastName: "",
+    specialty: null,
+    email: "",
+    gender: Gender.FEMALE,
+    cellNumber: "",
+    crm: "",
+    address: {
+      publicPlace: "",
+      number: Number(),
+      district: "",
+      city: "",
+      state: "",
+      country: "Brasil",
+      zipCode: "",
+      complement: "",
+    },
+  });
+  edit.value = false;
+  emit("closeForm");
+}
+
+const edit = ref(false);
+function disabledField(): boolean {
+  return doctor.id && !edit.value ? true : false;
+}
+
+function changeDoctor(value: boolean): void {
+  edit.value = value;
+  if (!value) {
+    close();
+  }
+}
 
 const states = reactive([
   "AC",
@@ -219,23 +311,23 @@ const states = reactive([
 const { notifySuccess, notifyError } = useNotifierHook();
 
 function register(): void {
-  DoctorService.registerDoctor(doctor)
-    .then((response) => {
-      close();
-      notifySuccess("Doutor cadastrado com sucesso!");
-      console.log(response);
-    })
-    .catch((error) => notifyError(error));
-}
-
-const props = defineProps({
-  render: Boolean,
-});
-
-const emit = defineEmits(["closeForm"]);
-
-function close(): void {
-  emit("closeForm");
+  if (!doctor.id) {
+    DoctorService.registerDoctor(doctor)
+      .then((response) => {
+        close();
+        notifySuccess("Doutor cadastrado com sucesso!");
+        console.log(response);
+      })
+      .catch((error) => notifyError(error));
+  } else {
+    DoctorService.updateDoctor(doctor.id, doctor)
+      .then((response) => {
+        close();
+        notifySuccess("Doutor atualizado com sucesso!");
+        console.log(response);
+      })
+      .catch((error) => notifyError(error));
+  }
 }
 </script>
 
@@ -265,6 +357,11 @@ p,
   color: var(--light);
 }
 
+.button-cancel {
+  background: #ce1515;
+  margin-bottom: 0rem;
+  color: var(--light);
+}
 .modal-background {
   background-color: rgb(197 230 236 / 80%);
 }

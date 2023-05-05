@@ -26,6 +26,10 @@ class DoctorService {
   public updateDoctor(id: Number, doctor: Doctor): Promise<any> {
     return httpClient.put(`/doctor/${id}`, doctor);
   }
+
+  public getSpecialties(): Promise<any> {
+    return httpClient.get("/doctor/specialties");
+  }
 }
 
 export default new DoctorService();

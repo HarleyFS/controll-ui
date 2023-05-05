@@ -7,6 +7,7 @@ export const useDoctorStore = defineStore("doctor", () => {
   const doctorList = ref<Array<Doctor>>([]);
   const currentDoctor = ref<Doctor>();
   const totalDoctors = ref(2);
+  const specialties = ref<Array<String>>();
 
   async function getDoctorList() {
     await DoctorService.getOneDoctorList().then(
@@ -20,6 +21,11 @@ export const useDoctorStore = defineStore("doctor", () => {
 
   const getCurrentDoctor = computed(() => currentDoctor);
 
+  async function getSpecialties() {
+    await DoctorService.getSpecialties().then(
+      (response) => (specialties.value = response.data)
+    )
+  }
   return {
     doctorList,
     currentDoctor,
@@ -27,5 +33,7 @@ export const useDoctorStore = defineStore("doctor", () => {
     setCurrentDoctor,
     getCurrentDoctor,
     totalDoctors,
+    getSpecialties,
+    specialties,
   };
 });
