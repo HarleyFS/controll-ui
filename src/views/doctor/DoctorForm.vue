@@ -8,26 +8,43 @@
     <template v-slot:body>
       <form>
         <div class="columns">
-          <CardInput inputSize="is-3" nameLabel="Nome">
+          <CardInput inputSize="is-7" nameLabel="Nome">
             <input
               class="input"
               type="text"
               placeholder="Nome"
-              v-model="doctor.name"
+              v-model="doctor.fullName"
               :disabled="disabledField()"
             />
           </CardInput>
 
-          <CardInput inputSize="is-3" nameLabel="Sobrenome">
-            <input
-              class="input"
-              type="text"
-              placeholder="Sobrenome"
-              v-model="doctor.lastName"
-              :disabled="disabledField()"
-            />
+          <CardInput inputSize="is-3" nameLabel="Sexo">
+            <div class="control" style="margin-top: 1rem">
+              <label class="radio">
+                <input
+                  type="radio"
+                  name="answer"
+                  :value="Gender.MALE"
+                  v-model="doctor.gender"
+                  :disabled="disabledField()"
+                />
+                Masculino
+              </label>
+              <label class="radio">
+                <input
+                  type="radio"
+                  name="answer"
+                  :value="Gender.FEMALE"
+                  v-model="doctor.gender"
+                  :disabled="disabledField()"
+                />
+                Feminino
+              </label>
+            </div>
           </CardInput>
+        </div>
 
+        <div class="columns">
           <CardInput inputSize="is-2" nameLabel="CRM">
             <input
               class="input"
@@ -38,7 +55,8 @@
               :disabled="disabledField()"
             />
           </CardInput>
-          <CardInput inputSize="is-4" nameLabel="Especialidades">
+
+          <CardInput inputSize="is-6" nameLabel="Especialidades">
             <div class="select">
               <select v-model="doctor.specialty" :disabled="disabledField()">
                 <option
@@ -244,8 +262,7 @@ const emit = defineEmits(["closeForm"]);
 function close(): void {
   doctor = reactive<Doctor>({
     id: null,
-    name: "",
-    lastName: "",
+    fullName: "",
     specialty: null,
     email: "",
     gender: Gender.FEMALE,
