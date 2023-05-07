@@ -138,6 +138,7 @@
                   v-mask="'#####-###'"
                   v-model="patient.address.zipCode"
                   :disabled="disableField()"
+                  :blur="getAddress()"
                 />
               </div>
             </div>
@@ -248,6 +249,7 @@ import type Patient from "@/interfaces/patient/IPatient";
 import PatientService from "@/services/PatientService";
 import { Gender } from "@/enums/GenderEnum";
 import useNotifierHook from "@/hooks/notifier-hook";
+import CepService from "@/services/CepService";
 
 const props = defineProps({
   render: Boolean,
@@ -329,6 +331,22 @@ watch(
   }
 );
 
+function getAddress(): void {
+  if (patient.address.zipCode.length == 9) {
+    CepService.getAddress(patient.address.zipCode)
+      .then((response) => {
+        if (response.data.erro != null && response.data.erro == "true") {
+          notifyInfo("Não foi possível encontrar CEP.");
+        }
+        patient.address.publicPlace = response.data.logradouro;
+        patient.address.district = response.data.bairro;
+        patient.address.city = response.data.localidade;
+        patient.address.state = response.data.uf;
+      })
+      .catch(() => notifyInfo("Não foi possível encontrar CEP."));
+  }
+}
+
 const states = reactive([
   "AC",
   "AL",
@@ -359,23 +377,21 @@ const states = reactive([
   "TO",
 ]);
 
-const { notifySuccess, notifyError } = useNotifierHook();
+const { notifySuccess, notifyError, notifyInfo } = useNotifierHook();
 
 function register(): void {
   if (!patient.id) {
     PatientService.registerPatient(patient)
-      .then((response) => {
+      .then(() => {
         close();
         notifySuccess("Paciente cadastrado com sucesso!");
-        console.log(response);
       })
       .catch((error) => notifyError(error));
   } else {
     PatientService.updatePatient(patient.id, patient)
-      .then((response) => {
+      .then(() => {
         close();
         notifySuccess("Paciente atualizado com sucesso!");
-        console.log(response);
       })
       .catch((error) => notifyError(error));
   }

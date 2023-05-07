@@ -110,6 +110,7 @@
                   v-mask="'#####-###'"
                   v-model="doctor.address.zipCode"
                   :disabled="disabledField()"
+                  :blur="getAddress()"
                 />
               </div>
             </div>
@@ -218,6 +219,7 @@ import CardInput from "@/components/CardInputComponent.vue";
 import { reactive, ref, watch, type PropType } from "vue";
 import type Doctor from "@/interfaces/doctor/IDoctor";
 import DoctorService from "@/services/DoctorService";
+import CepService from "@/services/CepService";
 import { Gender } from "@/enums/GenderEnum";
 import useNotifierHook from "@/hooks/notifier-hook";
 import { useDoctorStore } from "@/stores/doctor-store";
@@ -230,9 +232,8 @@ const props = defineProps({
 
 let doctor = reactive<Doctor>({
   id: null,
-  name: "",
-  lastName: "",
-  specialty: null,
+  fullName: "",
+  specialty: "",
   email: "",
   gender: Gender.FEMALE,
   cellNumber: "",
@@ -263,7 +264,7 @@ function close(): void {
   doctor = reactive<Doctor>({
     id: null,
     fullName: "",
-    specialty: null,
+    specialty: "",
     email: "",
     gender: Gender.FEMALE,
     cellNumber: "",
@@ -292,6 +293,21 @@ function changeDoctor(value: boolean): void {
   edit.value = value;
   if (!value) {
     close();
+  }
+}
+function getAddress(): void {
+  if (doctor.address.zipCode.length == 9) {
+    CepService.getAddress(doctor.address.zipCode)
+      .then((response) => {
+        if (response.data.erro != null && response.data.erro == "true") {
+          notifyInfo("Não foi possível encontrar CEP.");
+        }
+        doctor.address.publicPlace = response.data.logradouro;
+        doctor.address.district = response.data.bairro;
+        doctor.address.city = response.data.localidade;
+        doctor.address.state = response.data.uf;
+      })
+      .catch(() => notifyInfo("Não foi possível encontrar CEP."));
   }
 }
 
@@ -325,23 +341,21 @@ const states = reactive([
   "TO",
 ]);
 
-const { notifySuccess, notifyError } = useNotifierHook();
+const { notifySuccess, notifyError, notifyInfo } = useNotifierHook();
 
 function register(): void {
   if (!doctor.id) {
     DoctorService.registerDoctor(doctor)
-      .then((response) => {
+      .then(() => {
         close();
         notifySuccess("Doutor cadastrado com sucesso!");
-        console.log(response);
       })
       .catch((error) => notifyError(error));
   } else {
     DoctorService.updateDoctor(doctor.id, doctor)
-      .then((response) => {
+      .then(() => {
         close();
         notifySuccess("Doutor atualizado com sucesso!");
-        console.log(response);
       })
       .catch((error) => notifyError(error));
   }
