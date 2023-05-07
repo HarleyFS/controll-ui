@@ -10,7 +10,7 @@ class DoctorService {
     return httpClient.get(`/doctor/${id}`);
   }
 
-  public getOneDoctorList(page: number = 1): Promise<any> {
+  public getOneDoctorList(page: number = 0): Promise<any> {
     return httpClient.get(`/doctor?page=${page}&size=1`);
   }
 

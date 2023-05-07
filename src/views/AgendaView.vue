@@ -92,7 +92,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { useScheduleStore } from "@/stores/schedule-store";
 import { DatePicker } from "v-calendar";
 import AgendaForm from "./agenda/AgendaForm.vue";
 import Time from "@/components/TimeComponent.vue";
@@ -102,17 +101,12 @@ import type IDoctor from "@/interfaces/doctor/IDoctorList";
 import { useDoctorStore } from "@/stores/doctor-store";
 import DoctorService from "@/services/DoctorService";
 
-const scheduleStore = useScheduleStore();
 const scheduleList = ref<Array<any>>([]);
 const doctorStore = useDoctorStore();
 const doctor = ref<IDoctor>();
 
-onMounted(async () => {
+onMounted(() => {
   getCurrentDoctor(0);
-  await scheduleStore.getScheduleList();
-  scheduleList.value = scheduleStore.scheduleList;
-  await doctorStore.getDoctorList();
-  doctorStore.setCurrentDoctor(doctorStore.doctorList[0]);
 });
 
 async function getScheduleList() {
@@ -168,7 +162,6 @@ async function getCurrentDoctor(page: number) {
     doctor.value = response.data.content[0];
     if (doctor.value != null && doctor.value != undefined) {
       doctorStore.setCurrentDoctor(doctor.value);
-      doctorStore.currentDoctor = doctor.value;
       getScheduleList();
     }
   });

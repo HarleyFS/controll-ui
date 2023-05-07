@@ -13,7 +13,13 @@
             type="text"
             placeholder="Nome completo"
             v-model="schedule.fullName"
+            @click="setSearch(true)"
           />
+          <div v-for="patient in patientList" :key="Number(patient.id)">
+            <a @click="fillSchedule(patient)" class="panel-block is-active">
+              {{ patient.fullName }}
+            </a>
+          </div>
         </CardInput>
       </div>
 
@@ -98,10 +104,14 @@ import CardInput from "@/components/CardInputComponent.vue";
 import ScheduleService from "@/services/ScheduleService";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import { Gender } from "@/enums/GenderEnum";
-import { reactive, type PropType, watch } from "vue";
+import { reactive, type PropType, watch, ref, watchEffect } from "vue";
 import useNotifierHook from "@/hooks/notifier-hook";
 import { useDoctorStore } from "@/stores/doctor-store";
+import type IPatientList from "@/interfaces/patient/IPatientList";
+import PatientService from "@/services/PatientService";
+
 const doctorStore = useDoctorStore();
+const patientList = ref<Array<IPatientList>>([]);
 
 const props = defineProps({
   render: Boolean,
@@ -117,40 +127,100 @@ const props = defineProps({
 });
 
 const doctor = doctorStore.getCurrentDoctor;
-let schedule = reactive<ISchedule>({
+const schedule = reactive<ISchedule>({
   id: null,
-  fullName: props.schedule?.fullName,
+  fullName: "",
+  name: "",
+  lastName: "",
   gender: Gender.FEMALE,
   cellNumber: "",
-  birthDate: new Date(),
+  birthDate: null,
   scheduleDate: props.scheduleDate,
   doctor: doctor.value,
+  patient: null,
 });
 
 watch(
   () => props.schedule,
   (newValue) => {
     if (newValue != null && newValue.id != null) {
-      schedule = newValue;
+      schedule.id = newValue.id;
+      schedule.fullName = newValue.fullName;
+      schedule.gender = newValue.gender;
+      schedule.cellNumber = newValue.cellNumber;
+      schedule.birthDate = newValue.birthDate;
+      schedule.scheduleDate = newValue.scheduleDate;
+      schedule.doctor = newValue.doctor;
+      schedule.patient = newValue.patient;
     } else {
-      schedule = reactive<ISchedule>({
-        id: null,
-        fullName: props.schedule?.fullName,
-        gender: Gender.FEMALE,
-        cellNumber: "",
-        birthDate: new Date(),
-        scheduleDate: props.scheduleDate,
-        doctor: doctor.value,
-      });
+      fillScheduleDefault();
     }
   }
 );
+
+const isSearch = ref(false);
+
+function setSearch(value: boolean) {
+  isSearch.value = value;
+}
+
+async function loadPatientList() {
+  if (
+    schedule.fullName != null &&
+    schedule.fullName.length > 0 &&
+    isSearch.value
+  ) {
+    await PatientService.getPatientList(1, schedule.fullName).then(
+      (response) => {
+        patientList.value = response.data.content;
+      }
+    );
+  }
+}
+
+watchEffect(() => {
+  loadPatientList();
+});
+
+function clearPatientList() {
+  patientList.value = Array<IPatientList>();
+  isSearch.value = false;
+}
+
+function fillSchedule(patient: IPatientList) {
+  schedule.id = null;
+  schedule.fullName = patient.fullName;
+  schedule.gender = patient.gender;
+  schedule.name = patient.name;
+  schedule.lastName = patient.lastName;
+  schedule.cellNumber = patient.cellNumber;
+  schedule.birthDate = patient.birthDate;
+  schedule.scheduleDate = props.scheduleDate;
+  schedule.doctor = doctor.value;
+  schedule.patient = patient;
+  clearPatientList();
+}
+
+function fillScheduleDefault() {
+  schedule.id = null;
+  schedule.fullName = "";
+  schedule.name = "";
+  schedule.lastName = "";
+  schedule.gender = Gender.FEMALE;
+  schedule.cellNumber = "";
+  schedule.birthDate = null;
+  schedule.scheduleDate = props.scheduleDate;
+  schedule.doctor = doctor.value;
+  schedule.patient = null;
+}
 
 const { notifySuccess, notifyError } = useNotifierHook();
 
 const emit = defineEmits(["closeForm"]);
 
 function close(): void {
+  fillScheduleDefault();
+  clearPatientList();
   emit("closeForm");
 }
 

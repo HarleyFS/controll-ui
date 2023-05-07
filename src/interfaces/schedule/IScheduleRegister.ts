@@ -1,11 +1,15 @@
 import type { Gender } from "@/enums/GenderEnum";
-import type Doctor from "@/interfaces/doctor/IDoctorList";
+import type IDoctorList from "@/interfaces/doctor/IDoctorList";
+import type IPatientList from "@/interfaces/patient/IPatientList";
 export default interface IScheduleRegister {
   id: Number | null;
-  fullName: String;
+  fullName: String | null;
+  name: String | null;
+  lastName: String | null;
   cellNumber: String;
-  birthDate: Date;
+  birthDate: Date | null;
   scheduleDate: Date;
   gender: Gender;
-  doctor: Doctor | undefined;
+  doctor: IDoctorList | undefined;
+  patient: IPatientList | null;
 }
