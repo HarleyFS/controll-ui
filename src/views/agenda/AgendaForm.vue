@@ -14,6 +14,7 @@
             placeholder="Nome completo"
             v-model="schedule.fullName"
             @click="setSearch(true)"
+            :disabled="disableField()"
           />
           <div v-for="patient in patientList" :key="Number(patient.id)">
             <a @click="fillSchedule(patient)" class="panel-block is-active">
@@ -25,7 +26,12 @@
 
       <div class="columns">
         <CardInput inputSize="is-3" nameLabel="Data nascimento">
-          <input class="date" type="date" v-model="schedule.birthDate" />
+          <input
+            class="date"
+            type="date"
+            v-model="schedule.birthDate"
+            :disabled="disableField()"
+          />
         </CardInput>
 
         <CardInput inputSize="is-3" nameLabel="Sexo">
@@ -36,6 +42,7 @@
                 name="answer"
                 :value="Gender.MALE"
                 v-model="schedule.gender"
+                :disabled="disableField()"
               />
               Masculino
             </label>
@@ -45,6 +52,7 @@
                 name="answer"
                 :value="Gender.FEMALE"
                 v-model="schedule.gender"
+                :disabled="disableField()"
               />
               Feminino
             </label>
@@ -58,6 +66,7 @@
             placeholder="(00) 00000-0000"
             v-mask="['(##) #####-####']"
             v-model="schedule.cellNumber"
+            :disabled="disableField()"
           />
         </CardInput>
       </div>
@@ -79,20 +88,28 @@
     <template v-slot:footer>
       <button
         class="button button-person"
-        @click="create()"
-        v-if="!schedule.id"
+        @click="save()"
+        v-if="!disableField()"
       >
         Salvar
       </button>
-      <button class="button" @click="close()" v-if="!schedule.id">
-        Voltar
+      <button
+        class="button is-danger"
+        @click="editSchedule(false)"
+        v-if="!disableField()"
+      >
+        Cancelar
       </button>
 
-      <button class="button button-person" @click="update()" v-if="schedule.id">
-        Atualizar
+      <button
+        class="button button-person"
+        @click="editSchedule(true)"
+        v-if="disableField()"
+      >
+        Editar
       </button>
-      <button class="button is-danger" @click="close()" v-if="schedule.id">
-        Cancelar
+      <button class="button" @click="close()" v-if="disableField()">
+        Voltar
       </button>
     </template>
   </ModalComponent>
@@ -158,6 +175,18 @@ watch(
   }
 );
 
+const edit = ref(false);
+function disableField(): boolean {
+  return schedule.id && !edit.value ? true : false;
+}
+
+function editSchedule(value: boolean): void {
+  edit.value = value;
+  if (!value) {
+    close();
+  }
+}
+
 const isSearch = ref(false);
 
 function setSearch(value: boolean) {
@@ -221,29 +250,26 @@ const emit = defineEmits(["closeForm"]);
 function close(): void {
   fillScheduleDefault();
   clearPatientList();
+  edit.value = false;
   emit("closeForm");
 }
 
-function create(): void {
-  schedule.doctor = doctorStore.getCurrentDoctor.value;
-  ScheduleService.createSchedule(schedule)
-    .then(() => {
-      close();
-      notifySuccess("Consulta agendada com sucesso!");
-    })
-    .catch((error) => notifyError(error));
-}
-
-function update(): void {
-  if (schedule.id) {
+function save(): void {
+  if (!schedule.id) {
+    schedule.doctor = doctorStore.getCurrentDoctor.value;
+    ScheduleService.createSchedule(schedule)
+      .then(() => {
+        close();
+        notifySuccess("Consulta agendada com sucesso!");
+      })
+      .catch((error) => notifyError(error));
+  } else {
     ScheduleService.updateSchedule(schedule.id, schedule)
       .then(() => {
         close();
         notifySuccess("Dados alterados com sucesso!");
       })
       .catch((error) => notifyError(error));
-  } else {
-    notifySuccess("Ocorreu um erro, tente mais tarde.");
   }
 }
 </script>
