@@ -332,7 +332,7 @@ watch(
 );
 
 function getAddress(): void {
-  if (patient.address.zipCode.length == 9) {
+  if (patient.address.zipCode.length == 9 && !disableField()) {
     CepService.getAddress(patient.address.zipCode)
       .then((response) => {
         if (response.data.erro != null && response.data.erro == "true") {

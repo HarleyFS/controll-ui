@@ -296,7 +296,7 @@ function changeDoctor(value: boolean): void {
   }
 }
 function getAddress(): void {
-  if (doctor.address.zipCode.length == 9) {
+  if (doctor.address.zipCode.length == 9 && !disabledField()) {
     CepService.getAddress(doctor.address.zipCode)
       .then((response) => {
         if (response.data.erro != null && response.data.erro == "true") {
