@@ -62,10 +62,10 @@ const user = ref<Login>({
 const store = userStore();
 const { notifyError } = useNotifierHook();
 
-const authenticate = (): void => {
-  AuthenticationService.authenticate(user.value)
+const authenticate = async (): Promise<void> => {
+  await AuthenticationService.authenticate(user.value)
     .then((response) => {
-      store.storeToken(response.data.token);
+      store.setToken(response.data.token);
       router.push({ name: "dashboard" });
     })
     .catch((error) => notifyError(error));

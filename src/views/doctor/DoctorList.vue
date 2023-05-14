@@ -71,7 +71,7 @@ import DoctorService from "@/services/DoctorService";
 import type IDoctor from "@/interfaces/doctor/IDoctor";
 
 export default defineComponent({
-  name: "PacientView",
+  name: "DoctorList",
   components: {
     DoctorForm,
     PaginationComponent,

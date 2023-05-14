@@ -11,7 +11,7 @@ class ScheduleService {
   }
 
   public getScheduleList(doctorId: Number): Promise<any> {
-    return httpClient.get(`/schedule?doctorId=${doctorId}`);
+    return httpClient.get(`/schedule?doctorId=${doctorId}&size=1000`);
   }
 
   public deleteScheduleById(id: Number): Promise<any> {

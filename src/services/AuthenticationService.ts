@@ -1,4 +1,4 @@
-import httpClient from "@/http";
+import httpClient from "@/http/auth";
 import type User from "@/interfaces/authentication/IUser";
 import type Login from "@/interfaces/authentication/ILogin";
 
@@ -9,6 +9,14 @@ class AuthenticationService {
 
   public authenticate(login: Login): Promise<any> {
     return httpClient.post("/login", login);
+  }
+
+  public verifyToken(token: String): Promise<any> {
+    return httpClient.get(`verify/${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 }
 

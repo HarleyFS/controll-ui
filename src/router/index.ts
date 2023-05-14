@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import { userStore } from "@/stores/user-store";
+import AuthService from "@/services/AuthenticationService";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,16 +12,19 @@ const router = createRouter({
         {
           path: "/",
           name: "dashboard",
+          meta: { requiresAuth: true },
           component: () => import("@/views/DashboardView.vue"),
         },
 
         {
-          path: "/pacient",
+          path: "/patient",
           component: () => import("../views/PatientView.vue"),
+          meta: { requiresAuth: true },
           children: [
             {
               path: "",
-              name: "pacient",
+              name: "patient",
+              meta: { requiresAuth: true },
               component: () => import("../views/patient/PatientList.vue"),
             },
           ],
@@ -33,6 +37,7 @@ const router = createRouter({
             {
               path: "",
               name: "doctor",
+              meta: { requiresAuth: true },
               component: () => import("../views/doctor/DoctorList.vue"),
             },
           ],
@@ -41,6 +46,7 @@ const router = createRouter({
         {
           path: "/agenda",
           name: "/agenda",
+          meta: { requiresAuth: true },
           component: () => import("../views/AgendaView.vue"),
         },
       ],
@@ -49,12 +55,14 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
+      meta: { requiresAuth: false },
       component: () => import("@/views/LoginView.vue"),
     },
 
     {
       path: "/register",
       name: "register",
+      meta: { requiresAuth: false },
       component: () => import("@/views/RegisterView.vue"),
     },
 
@@ -67,6 +75,28 @@ const router = createRouter({
       component: () => import("../views/AboutView.vue"),
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  console.log("VERIFICANDO TOKEN...");
+  const store = userStore();
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem("token");
+    if (to.name !== "login" && token != null) {
+      await AuthService.verifyToken(token)
+        .then((response) => {
+          store.token = response.data;
+          next();
+        })
+        .catch(() => {
+          next({ name: "login" });
+        });
+    } else {
+      next({ name: "login" });
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

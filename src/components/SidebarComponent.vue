@@ -68,7 +68,7 @@ export default defineComponent({
           icon: "fas fa-calendar",
         },
         {
-          link: "/pacient",
+          link: "/patient",
           name: "Pacientes",
           icon: "fa fa-user-group",
         },

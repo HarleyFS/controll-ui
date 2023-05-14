@@ -61,16 +61,16 @@
     ></PaginationComponent>
   </section>
 
-  <PacientForm
+  <PatientForm
     :render="render"
     :patient="patient"
     @closeForm="renderModal()"
-  ></PacientForm>
+  ></PatientForm>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect, reactive } from "vue";
-import PacientForm from "@/views/patient/PatientForm.vue";
+import PatientForm from "@/views/patient/PatientForm.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import { usePatientStore } from "@/stores/patient-store";
 import type Patient from "@/interfaces/patient/IPatientList";
@@ -78,9 +78,9 @@ import PatientService from "@/services/PatientService";
 import type IPatient from "@/interfaces/patient/IPatient";
 
 export default defineComponent({
-  name: "PacientView",
+  name: "PatientList",
   components: {
-    PacientForm,
+    PatientForm,
     PaginationComponent,
   },
 
