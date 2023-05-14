@@ -34,7 +34,9 @@
               <div id="company">{{ "Clinica Controll" }}</div>
             </div>
           </div>
-          <i class="fa-solid fa-right-from-bracket" id="logout-button"></i>
+          <router-link @click="logout()" to="/login">
+            <i class="fa-solid fa-right-from-bracket" id="logout-button"></i>
+          </router-link>
         </div>
       </div>
     </aside>
@@ -77,16 +79,17 @@ export default defineComponent({
           name: "Doutores",
           icon: "fas fa-user-doctor",
         },
-        {
-          link: "/about",
-          name: "Documentos",
-          icon: "fas fa-folder",
-        },
-        {
-          link: "#",
-          name: "Configurações",
-          icon: "fas fa-gear",
-        },
+        // FEATURE
+        // {
+        //   link: "/about",
+        //   name: "Documentos",
+        //   icon: "fas fa-folder",
+        // },
+        // {
+        //   link: "#",
+        //   name: "Configurações",
+        //   icon: "fas fa-gear",
+        // },
       ],
     },
   },
@@ -98,9 +101,14 @@ export default defineComponent({
       isExpanded.value = !isExpanded.value;
     };
 
+    function logout() {
+      localStorage.removeItem("token");
+    }
+
     return {
       expand,
       isExpanded,
+      logout,
       props,
     };
   },

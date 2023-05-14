@@ -8,7 +8,13 @@
     ></i>
     <i v-else @click="open()"></i>
   </p>
-  <p class="subtitle" style="padding: 1px 4px 1px 4px;" @click="open()">{{ props.schedule?.fullName }}</p>
+  <p class="subtitle" :style="getColor()" @click="open()">
+    {{
+      props.schedule != null && props.schedule.patient != null
+        ? props.schedule.patient.name + " " + props.schedule.patient.lastName
+        : props.schedule?.fullName
+    }}
+  </p>
 </template>
 
 <script lang="ts" setup>
@@ -41,6 +47,20 @@ function open(): void {
     schedule: props.schedule,
   });
 }
+function getColor(): String {
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  if (
+    props.schedule != null &&
+    props.schedule.scheduleDate != null &&
+    new Date(props.schedule.scheduleDate) > currentDate
+  ) {
+    return `background-color: #2daab8`;
+  } else {
+    return `background-color: #a9a4a4`;
+  }
+}
 </script>
 
 <style scoped>
@@ -62,5 +82,6 @@ p.subtitle {
   border-radius: 8px;
   margin-right: 8px;
   cursor: pointer;
+  padding: 1px 4px 1px 4px;
 }
 </style>
