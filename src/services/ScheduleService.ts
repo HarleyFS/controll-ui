@@ -10,8 +10,10 @@ class ScheduleService {
     return httpClient.get(`/schedule/${id}`);
   }
 
-  public getScheduleList(doctorId: Number): Promise<any> {
-    return httpClient.get(`/schedule?doctorId=${doctorId}&size=1000`);
+  public getScheduleList(doctorId: Number, currentDate: Date): Promise<any> {
+    return httpClient.get(
+      `/schedule?doctorId=${doctorId}&currentDate=${currentDate.toLocaleDateString()}&size=200`
+    );
   }
 
   public deleteScheduleById(id: Number): Promise<any> {
@@ -20,6 +22,10 @@ class ScheduleService {
 
   public updateSchedule(id: Number, schedule: Schedule): Promise<any> {
     return httpClient.put(`/schedule/${id}`, schedule);
+  }
+
+  public getAmountSchedules(doctorId: Number): Promise<any> {
+    return httpClient.get(`/schedule/amount?doctorId=${doctorId}`);
   }
 }
 

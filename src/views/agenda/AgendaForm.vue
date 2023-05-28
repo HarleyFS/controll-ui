@@ -79,7 +79,7 @@
 
         <CardInput inputSize="is-3" nameLabel="Horário">
           <div class="custom-label">
-            {{ schedule.scheduleDate.toLocaleString().replace(",", "  ") }}
+            {{ schedule.scheduleDateTime.toLocaleString().replace(",", "  ") }}
           </div>
         </CardInput>
       </div>
@@ -133,7 +133,7 @@ const patientList = ref<Array<IPatientList>>([]);
 const props = defineProps({
   render: Boolean,
   id: Number,
-  scheduleDate: {
+  scheduleDateTime: {
     type: Date,
     default: null,
   },
@@ -152,19 +152,19 @@ const schedule = reactive<ISchedule>({
   gender: Gender.FEMALE,
   cellNumber: "",
   birthDate: null,
-  scheduleDate: props.scheduleDate,
+  scheduleDateTime: props.scheduleDateTime,
   doctor: doctor.value,
   patient: null,
 });
 
-watch([() => props.schedule, () => props.scheduleDate], ([newValue]) => {
+watch([() => props.schedule, () => props.scheduleDateTime], ([newValue]) => {
   if (newValue != null && newValue.id != null) {
     schedule.id = newValue.id;
     schedule.fullName = newValue.fullName;
     schedule.gender = newValue.gender;
     schedule.cellNumber = newValue.cellNumber;
     schedule.birthDate = newValue.birthDate;
-    schedule.scheduleDate = newValue.scheduleDate;
+    schedule.scheduleDateTime = newValue.scheduleDateTime;
     schedule.doctor = newValue.doctor;
     schedule.patient = newValue.patient;
   } else {
@@ -221,7 +221,7 @@ function fillSchedule(patient: IPatientList) {
   schedule.lastName = patient.lastName;
   schedule.cellNumber = patient.cellNumber;
   schedule.birthDate = patient.birthDate;
-  schedule.scheduleDate = props.scheduleDate;
+  schedule.scheduleDateTime = props.scheduleDateTime;
   schedule.doctor = doctor.value;
   schedule.patient = patient;
   clearPatientList();
@@ -235,7 +235,7 @@ function fillScheduleDefault() {
   schedule.gender = Gender.FEMALE;
   schedule.cellNumber = "";
   schedule.birthDate = null;
-  schedule.scheduleDate = props.scheduleDate;
+  schedule.scheduleDateTime = props.scheduleDateTime;
   schedule.doctor = doctor.value;
   schedule.patient = null;
 }

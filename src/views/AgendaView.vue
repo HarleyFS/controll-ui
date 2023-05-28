@@ -75,7 +75,7 @@
           <div class="level-item has-text-centered">
             <div class="box">
               <p class="heading">Consultas Agendadas</p>
-              <p class="title">{{ scheduleList.length }}</p>
+              <p class="title">{{ amountSchedules }}</p>
             </div>
           </div>
         </div>
@@ -84,14 +84,14 @@
   </div>
   <AgendaForm
     :schedule="schedule"
-    :scheduleDate="calendarDate"
+    :scheduleDateTime="calendarDate"
     :render="render"
     @closeForm="renderModal"
   />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { DatePicker } from "v-calendar";
 import AgendaForm from "./agenda/AgendaForm.vue";
 import Time from "@/components/TimeComponent.vue";
@@ -104,6 +104,7 @@ import DoctorService from "@/services/DoctorService";
 const scheduleList = ref<Array<any>>([]);
 const doctorStore = useDoctorStore();
 const doctor = ref<IDoctor>();
+const amountSchedules = ref<Number>();
 
 onMounted(() => {
   getCurrentDoctor(0);
@@ -111,7 +112,10 @@ onMounted(() => {
 
 async function getScheduleList() {
   if (doctor.value != null && doctor.value.id != null) {
-    await ScheduleService.getScheduleList(doctor.value.id).then((reponse) => {
+    await ScheduleService.getScheduleList(
+      doctor.value.id,
+      calendarDate.value
+    ).then((reponse) => {
       scheduleList.value = reponse.data.content;
     });
   }
@@ -130,7 +134,7 @@ function getSchedule(hour: number, minute: number) {
     scheduleList.value.forEach((element) => {
       const boardDate = new Date(calendarDate.value);
       boardDate.setHours(hour, minute, 0, 0);
-      const scheduleDate = new Date(element.scheduleDate);
+      const scheduleDate = new Date(element.scheduleDateTime);
 
       if (boardDate.getTime() == scheduleDate.getTime()) {
         name = element;
@@ -163,8 +167,17 @@ async function getCurrentDoctor(page: number) {
     if (doctor.value != null && doctor.value != undefined) {
       doctorStore.setCurrentDoctor(doctor.value);
       getScheduleList();
+      getAmountSchedules();
     }
   });
+}
+
+function getAmountSchedules() {
+  if (doctor.value != null && doctor.value.id != null) {
+    ScheduleService.getAmountSchedules(doctor.value.id).then(
+      (response) => (amountSchedules.value = response.data)
+    );
+  }
 }
 
 const render = ref(false);
@@ -176,6 +189,10 @@ const renderModal = (hours: any) => {
   render.value = !render.value;
   getScheduleList();
 };
+
+watch([() => calendarDate.value], () => {
+  getScheduleList();
+});
 </script>
 
 <style scoped>

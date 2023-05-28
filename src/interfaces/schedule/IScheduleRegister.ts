@@ -8,7 +8,7 @@ export default interface IScheduleRegister {
   lastName: String | null;
   cellNumber: String;
   birthDate: Date | null;
-  scheduleDate: Date;
+  scheduleDateTime: Date;
   gender: Gender;
   doctor: IDoctorList | undefined;
   patient: IPatientList | null;
