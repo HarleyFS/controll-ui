@@ -50,7 +50,7 @@
     </div>
     <div class="tile is-parent is-8">
       <article class="tile is-child box">
-        <LineChartsComponent />
+        <LineChartsComponent :dataList="data"/>
       </article>
     </div>
   </div>
@@ -86,24 +86,27 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import ColumnChartsComponent from "@/components/charts/ColumnChartsComponent.vue";
 import DonutChartsComponent from "@/components/charts/DonutChartsComponent.vue";
 import DonutChartsComponent2 from "@/components/charts/DonutChartsComponent2.vue";
 import LineChartsComponent from "@/components/charts/LineChartsComponent.vue";
 import PieChartsComponent from "@/components/charts/PieChartsComponent.vue";
 
-import { defineComponent } from "vue";
+import DashboardService from "@/services/DashboardService";
+import { onMounted, ref } from "vue";
+import type { IDataChart } from "@/interfaces/IDataChart";
 
-export default defineComponent({
-  name: "DashboardView",
-  components: {
-    ColumnChartsComponent,
-    DonutChartsComponent,
-    DonutChartsComponent2,
-    LineChartsComponent,
-    PieChartsComponent,
-  },
+let data = new Array();
+
+onMounted(async () => {
+  await DashboardService.getDataLineChart().then((response) => {
+    data.push(["Mês", "Consultas realizadas"]);
+    console.log(response.data)
+    response.data.dataLineChart.forEach((dataChart: IDataChart) => {
+      data.push([dataChart.key, dataChart.value]);
+    });
+  });
 });
 </script>
 
