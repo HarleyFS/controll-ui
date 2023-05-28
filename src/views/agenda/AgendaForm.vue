@@ -79,7 +79,7 @@
 
         <CardInput inputSize="is-3" nameLabel="Horário">
           <div class="custom-label">
-            {{ scheduleDate.toLocaleString().replace(",", "  ") }}
+            {{ schedule.scheduleDate.toLocaleString().replace(",", "  ") }}
           </div>
         </CardInput>
       </div>
@@ -157,23 +157,20 @@ const schedule = reactive<ISchedule>({
   patient: null,
 });
 
-watch(
-  () => props.schedule,
-  (newValue) => {
-    if (newValue != null && newValue.id != null) {
-      schedule.id = newValue.id;
-      schedule.fullName = newValue.fullName;
-      schedule.gender = newValue.gender;
-      schedule.cellNumber = newValue.cellNumber;
-      schedule.birthDate = newValue.birthDate;
-      schedule.scheduleDate = newValue.scheduleDate;
-      schedule.doctor = newValue.doctor;
-      schedule.patient = newValue.patient;
-    } else {
-      fillScheduleDefault();
-    }
+watch([() => props.schedule, () => props.scheduleDate], ([newValue]) => {
+  if (newValue != null && newValue.id != null) {
+    schedule.id = newValue.id;
+    schedule.fullName = newValue.fullName;
+    schedule.gender = newValue.gender;
+    schedule.cellNumber = newValue.cellNumber;
+    schedule.birthDate = newValue.birthDate;
+    schedule.scheduleDate = newValue.scheduleDate;
+    schedule.doctor = newValue.doctor;
+    schedule.patient = newValue.patient;
+  } else {
+    fillScheduleDefault();
   }
-);
+});
 
 const edit = ref(false);
 function disableField(): boolean {
