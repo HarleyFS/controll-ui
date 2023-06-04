@@ -48,23 +48,27 @@
         </div>
       </article>
     </div>
+
     <div class="tile is-parent is-8">
       <article class="tile is-child box">
         <LineChartsComponent :dataList="dataLine" />
       </article>
     </div>
   </div>
+
   <div class="tile is-ancestor">
     <div class="tile is-parent">
       <article class="tile is-child box">
         <DonutChartsComponent2 :dataList="dataDonut2" />
       </article>
     </div>
+
     <div class="tile is-parent">
       <article class="tile is-child box">
         <DonutChartsComponent :dataList="dataDonut" />
       </article>
     </div>
+
     <div class="tile is-parent">
       <article class="tile is-child box">
         <PieChartsComponent :dataList="dataPie" />
@@ -80,18 +84,21 @@ import LineChartsComponent from "@/components/charts/LineChartsComponent.vue";
 import PieChartsComponent from "@/components/charts/PieChartsComponent.vue";
 
 import DashboardService from "@/services/DashboardService";
-import { onMounted } from "vue";
+import { onMounted, reactive } from "vue";
 import type { IDataChart } from "@/interfaces/IDataChart";
+import type IScheduleRegister from "@/interfaces/schedule/IScheduleRegister";
 
-let dataLine = new Array();
-let dataDonut = new Array();
-let dataDonut2 = new Array();
-let dataPie = new Array();
+let dataLine = reactive<Array<Object>>([]);
+let dataDonut = reactive<Array<Object>>([]);
+let dataDonut2 = reactive<Array<Object>>([]);
+let dataPie = reactive<Array<Object>>([]);
+const schedulesList = reactive<Array<IScheduleRegister>>([]);
 
 onMounted(async () => {
   await DashboardService.getDataLineChart().then((response) => {
+    schedulesList.push(response.data.schedulesList);
+
     dataLine.push(["Mês", "Consultas realizadas"]);
-    console.log(response.data);
     response.data.dataLineChart.forEach((dataChart: IDataChart) => {
       dataLine.push([dataChart.key, dataChart.value]);
     });

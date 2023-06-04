@@ -19,7 +19,7 @@ export default defineComponent({
 
   props: {
     dataList: {
-      type: Array as PropType<Array<Array<Object>>>,
+      type: Array as PropType<Array<Object>>,
       default: () => [],
     },
   },
