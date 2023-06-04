@@ -50,61 +50,65 @@
     </div>
     <div class="tile is-parent is-8">
       <article class="tile is-child box">
-        <LineChartsComponent :dataList="data"/>
+        <LineChartsComponent :dataList="dataLine" />
       </article>
     </div>
   </div>
   <div class="tile is-ancestor">
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <DonutChartsComponent2 />
+        <DonutChartsComponent2 :dataList="dataDonut2" />
       </article>
     </div>
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <DonutChartsComponent />
+        <DonutChartsComponent :dataList="dataDonut" />
       </article>
     </div>
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <DonutChartsComponent />
-      </article>
-    </div>
-  </div>
-
-  <div class="tile is-ancestor">
-    <div class="tile is-parent is-8">
-      <article class="tile is-child box">
-        <ColumnChartsComponent />
-      </article>
-    </div>
-    <div class="tile is-parent">
-      <article class="tile is-child box">
-        <PieChartsComponent />
+        <PieChartsComponent :dataList="dataPie" />
       </article>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ColumnChartsComponent from "@/components/charts/ColumnChartsComponent.vue";
 import DonutChartsComponent from "@/components/charts/DonutChartsComponent.vue";
 import DonutChartsComponent2 from "@/components/charts/DonutChartsComponent2.vue";
 import LineChartsComponent from "@/components/charts/LineChartsComponent.vue";
 import PieChartsComponent from "@/components/charts/PieChartsComponent.vue";
 
 import DashboardService from "@/services/DashboardService";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import type { IDataChart } from "@/interfaces/IDataChart";
 
-let data = new Array();
+let dataLine = new Array();
+let dataDonut = new Array();
+let dataDonut2 = new Array();
+let dataPie = new Array();
 
 onMounted(async () => {
   await DashboardService.getDataLineChart().then((response) => {
-    data.push(["Mês", "Consultas realizadas"]);
-    console.log(response.data)
+    dataLine.push(["Mês", "Consultas realizadas"]);
+    console.log(response.data);
     response.data.dataLineChart.forEach((dataChart: IDataChart) => {
-      data.push([dataChart.key, dataChart.value]);
+      dataLine.push([dataChart.key, dataChart.value]);
+    });
+
+    dataDonut.push(["Comparecimento", "Consultas realizadas"]);
+    response.data.dataDonutChart.forEach((dataChart: IDataChart) => {
+      dataDonut.push([dataChart.key, dataChart.value]);
+    });
+
+    dataDonut2.push(["Sexo", "Consultas realizadas"]);
+    response.data.dataDonutChart2.forEach((dataChart: IDataChart) => {
+      dataDonut2.push([dataChart.key, dataChart.value]);
+    });
+
+    dataPie.push(["Especialidade", "Consultas realizadas"]);
+    response.data.dataPieChart.forEach((dataChart: IDataChart) => {
+      dataPie.push([dataChart.key, dataChart.value]);
     });
   });
 });
