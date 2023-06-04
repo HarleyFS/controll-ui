@@ -35,12 +35,12 @@
     </div>
 
     <div class="tile is-parent is-vertical">
-      <article class="tile is-child card-calender">
+      <article class="is-child card-calender" style="margin-bottom: 3rem">
         <p id="calendar" class="title">Calendário</p>
         <DatePicker v-model="calendarDate" style="width: 100%" />
       </article>
 
-      <article class="tile is-child box">
+      <article class="is-child box">
         <div class="level">
           <div class="level-left">
             <a @click="goToPreviousPage()">

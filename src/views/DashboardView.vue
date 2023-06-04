@@ -11,7 +11,9 @@
             <div class="content">
               <p>
                 <strong>Paciente</strong>
-                <br />Harley Ferreira <br />Idade: 18 anos - Sexo: M
+                <br />Nome: {{ schedule?.fullName }} <br />Idade:
+                {{ schedule?.age }} anos <br />Sexo:
+                {{ schedule?.gender == Gender.MALE ? "M" : "F" }}
               </p>
             </div>
           </div>
@@ -27,12 +29,20 @@
                   0 0 0 1px rgb(10 10 10 / 0%);
               "
             >
-              <p class="heading">Última Consulta</p>
-              <p class="info-patient">12/12/2022</p>
+              <p class="heading">Horário da Consulta</p>
+              <p class="info-patient">
+                {{
+                  schedule.scheduleDateTime
+                    ? new Date(schedule.scheduleDateTime)
+                        .toLocaleString()
+                        .replace(",", " ")
+                    : null
+                }}
+              </p>
             </div>
           </div>
 
-          <div class="level-item has-text-centered">
+          <!-- <div class="level-item has-text-centered">
             <div
               class="box"
               style="
@@ -44,7 +54,17 @@
               <p class="heading">Consultas</p>
               <p class="info-patient">4</p>
             </div>
-          </div>
+          </div> -->
+        </div>
+
+        <div class="has-text-centered">
+          <i
+            v-for="(j, i) in schedulesList.length"
+            :key="i"
+            :class="j == x ? 'fa-solid fa-circle' : 'fa-regular fa-circle'"
+            style="padding: 0.15rem"
+            @click="nextSchedule()"
+          ></i>
         </div>
       </article>
     </div>
@@ -84,20 +104,38 @@ import LineChartsComponent from "@/components/charts/LineChartsComponent.vue";
 import PieChartsComponent from "@/components/charts/PieChartsComponent.vue";
 
 import DashboardService from "@/services/DashboardService";
-import { onMounted, reactive } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import type { IDataChart } from "@/interfaces/IDataChart";
 import type IScheduleRegister from "@/interfaces/schedule/IScheduleRegister";
+import { Gender } from "@/enums/GenderEnum";
 
 let dataLine = reactive<Array<Object>>([]);
 let dataDonut = reactive<Array<Object>>([]);
 let dataDonut2 = reactive<Array<Object>>([]);
 let dataPie = reactive<Array<Object>>([]);
-const schedulesList = reactive<Array<IScheduleRegister>>([]);
+let schedulesList = reactive<Array<IScheduleRegister>>([]);
+let schedule = ref<IScheduleRegister>({
+  id: null,
+  fullName: "-",
+  name: "-",
+  lastName: "-",
+  gender: null,
+  cellNumber: "",
+  birthDate: null,
+  age: null,
+  scheduleDateTime: null,
+  doctor: null,
+  patient: null,
+});
 
+let x = ref<Number>(1);
+let count = 1;
 onMounted(async () => {
   await DashboardService.getDataLineChart().then((response) => {
-    schedulesList.push(response.data.schedulesList);
-
+    schedulesList = response.data.schedulesList;
+    if (schedulesList.length > 0) {
+      schedule.value = schedulesList[0];
+    }
     dataLine.push(["Mês", "Consultas realizadas"]);
     response.data.dataLineChart.forEach((dataChart: IDataChart) => {
       dataLine.push([dataChart.key, dataChart.value]);
@@ -118,7 +156,26 @@ onMounted(async () => {
       dataPie.push([dataChart.key, dataChart.value]);
     });
   });
+
+  setInterval(() => {
+    x.value = count;
+    schedule.value = schedulesList[count - 1];
+    if (count > schedulesList.length - 1) {
+      count = 0;
+    }
+
+    count++;
+  }, 5000);
 });
+
+function nextSchedule() {
+  x.value = count;
+  schedule.value = schedulesList[count - 1];
+  if (count > schedulesList.length - 1) {
+    count = 0;
+  }
+  count++;
+}
 </script>
 
 <style scoped>
