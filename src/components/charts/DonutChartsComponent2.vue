@@ -7,10 +7,10 @@ export const type = "PieChart";
 export const options = {
   title: "Consultas",
   titlePosition: "center",
-  pieHole: 0.3,
+  pieHole: 0.25,
   colors: ["#2daab8", "#e6693e"],
   legend: {
-    position: "bottom",
+    position: "right",
   },
 };
 

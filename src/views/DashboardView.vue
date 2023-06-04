@@ -4,7 +4,7 @@
       <article class="tile is-child box">
         <div class="media is-6">
           <figure class="media-left image is-128x128">
-            <img class="is-rounded" src="../assets/doctor.jpg" />
+            <img class="is-rounded" src="../assets/men-women.png" />
           </figure>
 
           <div class="media-content" style="margin-top: 1rem">
