@@ -53,8 +53,8 @@ function getColor(): String {
 
   if (
     props.schedule != null &&
-    props.schedule.scheduleDate != null &&
-    new Date(props.schedule.scheduleDate) > currentDate
+    props.schedule.scheduleDateTime != null &&
+    new Date(props.schedule.scheduleDateTime) > currentDate
   ) {
     return `background-color: #2daab8`;
   } else {

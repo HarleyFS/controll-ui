@@ -1,25 +1,16 @@
 <script lang="ts">
-import { defineComponent, h } from "vue";
-
+import { defineComponent, h, reactive, type PropType } from "vue";
 import { GChart } from "vue-google-charts";
 
 export const type = "PieChart";
 
-export const data = [
-  ["Sexo", "Número"],
-  ["Feminino", 13],
-  ["Masculino", 5],
-];
-
 export const options = {
   title: "Sexo",
-  pieHole: 0.3,
+  pieHole: 0.25,
   colors: ["#2daab8", "#e6693e"],
   legend: {
-    position: "bottom",
+    position: "right",
   },
-  //   width: 800,
-  //   height: 600,
 };
 
 export default defineComponent({
@@ -27,7 +18,17 @@ export default defineComponent({
   components: {
     GChart,
   },
-  setup() {
+
+  props: {
+    dataList: {
+      type: Array as PropType<Array<Object>>,
+      default: () => [],
+    },
+  },
+
+  setup(props) {
+    const data = reactive(props.dataList);
+
     return () =>
       h(GChart, {
         data,

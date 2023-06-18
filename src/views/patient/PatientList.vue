@@ -41,7 +41,9 @@
           <td>{{ patient.lastName }}</td>
           <td>{{ patient.cellNumber }}</td>
           <td>{{ patient.age }} anos</td>
-          <td>{{ patient.gender }}</td>
+          <td>
+            {{ patient.gender == "MALE" ? "Masculino" : "Feminino"}}
+          </td>
           <td>{{ patient.email }}</td>
           <td>
             <i
@@ -85,6 +87,7 @@ export default defineComponent({
   },
 
   setup() {
+
     const patientFilter = ref("");
     const render = ref(false);
     const patientStore = usePatientStore();
