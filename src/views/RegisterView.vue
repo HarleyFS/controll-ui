@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-if="!emailSent" class="container">
     <div class="card-login">
       <form @submit.prevent="register">
         <h2 class="title">Cadastre-se</h2>
@@ -48,14 +48,17 @@
       </form>
     </div>
   </div>
+
+  <SuccessView v-else :title="title" :message="messagem" :icon="icon" />
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
 import type User from "@/interfaces/authentication/IUser";
 import AuthenticationService from "@/services/AuthenticationService";
-import router from "@/router";
 import useNotifierHook from "@/hooks/notifier-hook";
+import SuccessView from "./SuccessView.vue";
+const { notifyError } = useNotifierHook();
 
 const user = ref<User>({
   email: "",
@@ -63,13 +66,16 @@ const user = ref<User>({
   password: "",
   lastname: "",
 });
-
-const { notifyError } = useNotifierHook();
+const emailSent = ref<Boolean>(false);
+const title = "Estamos quase lá";
+const messagem =
+  "Enviamos as instruções para o seu email. Acesso-o e siga as instruções para validar sua conta.";
+const icon = "fa-regular fa-face-laugh-wink";
 
 const register = (): void => {
   AuthenticationService.register(user.value)
     .then(() => {
-      router.push("/login");
+      emailSent.value = true;
     })
     .catch((error) => notifyError(error));
 };

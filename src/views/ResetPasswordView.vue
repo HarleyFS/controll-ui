@@ -1,19 +1,22 @@
 <template>
-  <div class="container">
+  <div v-if="!emailSent" class="container">
     <div class="card-login">
-      <form @submit.prevent="authenticate">
-        <h2 class="title">Login</h2>
+      <form @submit.prevent="resetPassword">
+        <h2 class="title">Redefinir senha</h2>
+        <p style="margin-bottom: 2rem">
+          Informe a nova senha nos campos abaixo.
+        </p>
 
         <div class="field">
-          <p class="control has-icons-left has-icons-right">
+          <p class="control has-icons-left">
             <input
               class="input"
-              type="email"
-              placeholder="Email"
-              v-model="user.email"
+              type="password"
+              placeholder="Nova senha"
+              v-model="password.password"
             />
             <span class="icon is-small is-left">
-              <i class="fas fa-envelope"></i>
+              <i class="fas fa-lock"></i>
             </span>
           </p>
         </div>
@@ -23,8 +26,8 @@
             <input
               class="input"
               type="password"
-              placeholder="Password"
-              v-model="user.password"
+              placeholder="Confirmar nova senha"
+              v-model="password.passwordConfirm"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-lock"></i>
@@ -32,44 +35,40 @@
           </p>
         </div>
 
-        <router-link to="/recover-password">
-          <a>Esqueceu sua senha?</a>
-        </router-link>
-
-        <input type="submit" class="button" value="Entrar" />
-
-        <router-link to="/register">
-          <input type="submit" class="button" value="Cria uma conta" />
-        </router-link>
+        <input type="submit" class="button" value="Redefinir" />
       </form>
     </div>
   </div>
+  <SuccessView v-else :message="message" />
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import type Login from "@/interfaces/authentication/ILogin";
 import AuthenticationService from "@/services/AuthenticationService";
-import { userStore } from "@/stores/user-store";
-import router from "@/router";
 import useNotifierHook from "@/hooks/notifier-hook";
+import type Password from "@/interfaces/authentication/IPassword";
+import router from "@/router";
 
-const user = ref<Login>({
-  email: "",
-  password: "",
-});
-
-const store = userStore();
 const { notifyError } = useNotifierHook();
 
-const authenticate = async (): Promise<void> => {
-  await AuthenticationService.authenticate(user.value)
-    .then((response) => {
-      store.setToken(response.data.token);
-      router.push({ name: "dashboard" });
-    })
-    .catch((error) => notifyError(error));
-};
+const password = ref<Password>({
+  password: "",
+  passwordConfirm: "",
+  token: router.currentRoute.value.params.token.toString(),
+});
+const emailSent = ref<Boolean>(false);
+const message =
+  "Senha alterado com sucesso. Clique no botão abaixo para acesso sua conta ";
+
+async function resetPassword() {
+  if (router.currentRoute.value.params.token != null) {
+    await AuthenticationService.resetPassword(password.value)
+      .then(() => {
+        emailSent.value = true;
+      })
+      .catch((error) => notifyError(error));
+  }
+}
 </script>
 
 <style scoped>
@@ -86,19 +85,6 @@ const authenticate = async (): Promise<void> => {
 
 form {
   width: 360px;
-}
-
-a {
-  display: block;
-  text-align: right;
-  text-decoration: none;
-  color: #69797b;
-  font-size: 1rem;
-  transition: 0.5s;
-}
-
-a:hover {
-  color: var(--dark);
 }
 
 .button {

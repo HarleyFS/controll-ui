@@ -66,6 +66,19 @@ const router = createRouter({
       component: () => import("@/views/RegisterView.vue"),
     },
 
+    {
+      path: "/recover-password",
+      name: "recover",
+      meta: { requiresAuth: false },
+      component: () => import("@/views/RecoverPasswordView.vue"),
+    },
+
+    {
+      path: "/reset-password/:token",
+      name: "reset",
+      meta: { requiresAuth: false },
+      component: () => import("@/views/ResetPasswordView.vue"),
+    },
     // {
     //   path: "/about",
     //   name: "about",
