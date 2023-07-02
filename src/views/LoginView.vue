@@ -44,6 +44,7 @@
       </form>
     </div>
   </div>
+  <SpinnerComponent v-if="showSpinner" />
 </template>
 
 <script lang="ts" setup>
@@ -53,6 +54,7 @@ import AuthenticationService from "@/services/AuthenticationService";
 import { userStore } from "@/stores/user-store";
 import router from "@/router";
 import useNotifierHook from "@/hooks/notifier-hook";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
 const user = ref<Login>({
   email: "",
@@ -61,14 +63,17 @@ const user = ref<Login>({
 
 const store = userStore();
 const { notifyError } = useNotifierHook();
+const showSpinner = ref<Boolean>(false);
 
 const authenticate = async (): Promise<void> => {
+  showSpinner.value = true;
   await AuthenticationService.authenticate(user.value)
     .then((response) => {
       store.setToken(response.data.token);
       router.push({ name: "dashboard" });
     })
     .catch((error) => notifyError(error));
+  showSpinner.value = false;
 };
 </script>
 

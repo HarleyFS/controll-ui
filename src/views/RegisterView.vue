@@ -48,7 +48,7 @@
       </form>
     </div>
   </div>
-
+  <SpinnerComponent v-if="showSpinner" />
   <SuccessView v-else :title="title" :message="messagem" :icon="icon" />
 </template>
 
@@ -58,6 +58,8 @@ import type User from "@/interfaces/authentication/IUser";
 import AuthenticationService from "@/services/AuthenticationService";
 import useNotifierHook from "@/hooks/notifier-hook";
 import SuccessView from "./SuccessView.vue";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
+
 const { notifyError } = useNotifierHook();
 
 const user = ref<User>({
@@ -71,13 +73,17 @@ const title = "Estamos quase lá";
 const messagem =
   "Enviamos as instruções para o seu email. Acesso-o e siga as instruções para validar sua conta.";
 const icon = "fa-regular fa-face-laugh-wink";
+const showSpinner = ref<Boolean>(false);
 
 const register = (): void => {
+  showSpinner.value = true;
   AuthenticationService.register(user.value)
     .then(() => {
       emailSent.value = true;
     })
     .catch((error) => notifyError(error));
+    showSpinner.value = false;
+
 };
 </script>
 
