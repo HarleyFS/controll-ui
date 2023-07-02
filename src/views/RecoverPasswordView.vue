@@ -1,8 +1,12 @@
 <template>
-  <div class="container">
+  <div v-if="!emailSent" class="container">
     <div class="card-login">
-      <form @submit.prevent="authenticate">
-        <h2 class="title">Login</h2>
+      <form @submit.prevent="resetPassword">
+        <h2 class="title">Recuperação de senha</h2>
+        <p style="margin-bottom: 2rem">
+          Informe seu e-mail cadastrado e receba instruções para recuperar seu
+          acesso.
+        </p>
 
         <div class="field">
           <p class="control has-icons-left has-icons-right">
@@ -10,7 +14,7 @@
               class="input"
               type="email"
               placeholder="Email"
-              v-model="user.email"
+              v-model="email"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-envelope"></i>
@@ -18,58 +22,36 @@
           </p>
         </div>
 
-        <div class="field">
-          <p class="control has-icons-left">
-            <input
-              class="input"
-              type="password"
-              placeholder="Password"
-              v-model="user.password"
-            />
-            <span class="icon is-small is-left">
-              <i class="fas fa-lock"></i>
-            </span>
-          </p>
-        </div>
-
-        <router-link to="/recover-password">
-          <a>Esqueceu sua senha?</a>
-        </router-link>
-
-        <input type="submit" class="button" value="Entrar" />
-
-        <router-link to="/register">
-          <input type="submit" class="button" value="Cria uma conta" />
+        <input type="submit" class="button" value="Enviar" />
+        <router-link to="/login">
+          <button class="button">Conecte-se</button>
         </router-link>
       </form>
     </div>
   </div>
+  <SuccessView v-else :message="message" />
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import type Login from "@/interfaces/authentication/ILogin";
 import AuthenticationService from "@/services/AuthenticationService";
-import { userStore } from "@/stores/user-store";
-import router from "@/router";
 import useNotifierHook from "@/hooks/notifier-hook";
+import SuccessView from "./SuccessView.vue";
 
-const user = ref<Login>({
-  email: "",
-  password: "",
-});
-
-const store = userStore();
 const { notifyError } = useNotifierHook();
 
-const authenticate = async (): Promise<void> => {
-  await AuthenticationService.authenticate(user.value)
-    .then((response) => {
-      store.setToken(response.data.token);
-      router.push({ name: "dashboard" });
+const email = ref<String>("");
+const emailSent = ref<Boolean>(false);
+const message =
+  "Enviamos as instruções para o seu email. Acesso-o e siga as instruções para alterar sua senha.";
+
+async function resetPassword() {
+  await AuthenticationService.recoverPassword(email.value)
+    .then(() => {
+      emailSent.value = true;
     })
     .catch((error) => notifyError(error));
-};
+}
 </script>
 
 <style scoped>
@@ -86,6 +68,10 @@ const authenticate = async (): Promise<void> => {
 
 form {
   width: 360px;
+}
+
+h2 {
+  font-size: 1.5rem;
 }
 
 a {
