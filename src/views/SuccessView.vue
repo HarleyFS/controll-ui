@@ -57,7 +57,7 @@ p {
 }
 
 #icon-success {
-  color: #1f5151;
+  color: var(--primary);
   font-size: 100px;
   align-self: center;
 }

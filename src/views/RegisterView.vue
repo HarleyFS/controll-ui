@@ -47,8 +47,8 @@
         <input type="submit" class="button" value="Cadastrar" />
       </form>
     </div>
+    <SpinnerComponent v-if="showSpinner" />
   </div>
-  <SpinnerComponent v-if="showSpinner" />
   <SuccessView v-else :title="title" :message="messagem" :icon="icon" />
 </template>
 
@@ -75,14 +75,14 @@ const messagem =
 const icon = "fa-regular fa-face-laugh-wink";
 const showSpinner = ref<Boolean>(false);
 
-const register = (): void => {
+const register = async (): Promise<void> => {
   showSpinner.value = true;
-  AuthenticationService.register(user.value)
+  await AuthenticationService.register(user.value)
     .then(() => {
       emailSent.value = true;
     })
     .catch((error) => notifyError(error));
-    showSpinner.value = false;
+  showSpinner.value = false;
 
 };
 </script>
