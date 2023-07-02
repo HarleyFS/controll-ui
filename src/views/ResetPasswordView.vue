@@ -38,8 +38,9 @@
         <input type="submit" class="button" value="Redefinir" />
       </form>
     </div>
+    <SpinnerComponent v-if="showSpinner" />
   </div>
-  <SuccessView v-else :message="message" />
+  <SuccessView v-else :title="title" :message="message" />
 </template>
 
 <script lang="ts" setup>
@@ -48,6 +49,7 @@ import AuthenticationService from "@/services/AuthenticationService";
 import useNotifierHook from "@/hooks/notifier-hook";
 import type Password from "@/interfaces/authentication/IPassword";
 import router from "@/router";
+import SuccessView from "@/views/SuccessView.vue";
 
 const { notifyError } = useNotifierHook();
 
@@ -57,16 +59,20 @@ const password = ref<Password>({
   token: router.currentRoute.value.params.token.toString(),
 });
 const emailSent = ref<Boolean>(false);
+const showSpinner = ref<Boolean>(false);
+const title = "Senha alterada!";
 const message =
-  "Senha alterado com sucesso. Clique no botão abaixo para acesso sua conta ";
+  "Sua senha alterada com sucesso. Acesse a página de login para entrar.";
 
 async function resetPassword() {
   if (router.currentRoute.value.params.token != null) {
+    showSpinner.value = true;
     await AuthenticationService.resetPassword(password.value)
       .then(() => {
         emailSent.value = true;
       })
       .catch((error) => notifyError(error));
+    showSpinner.value = false;
   }
 }
 </script>
