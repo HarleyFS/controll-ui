@@ -70,12 +70,29 @@
             </div>
           </div>
         </div>
-
         <div class="level" style="margin-top: 2rem">
           <div class="level-item has-text-centered">
             <div class="box">
-              <p class="heading">Consultas Agendadas</p>
-              <p class="title">{{ amountSchedules }}</p>
+              <p class="heading">Realizadas</p>
+              <p class="title" style="color: #1ed5a4">
+                {{ amountSchedules?.DONE }}
+              </p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div class="box" style="padding: 2rem">
+              <p class="heading">Agendadas</p>
+              <p class="title" style="color: #2daab8">
+                {{ amountSchedules?.PENDING }}
+              </p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div class="box">
+              <p class="heading">Canceladas</p>
+              <p class="title" style="color: #f14668">
+                {{ amountSchedules?.CANCELED }}
+              </p>
             </div>
           </div>
         </div>
@@ -104,7 +121,7 @@ import DoctorService from "@/services/DoctorService";
 const scheduleList = ref<Array<any>>([]);
 const doctorStore = useDoctorStore();
 const doctor = ref<IDoctor>();
-const amountSchedules = ref<Number>();
+const amountSchedules = ref();
 
 onMounted(() => {
   getCurrentDoctor(0);

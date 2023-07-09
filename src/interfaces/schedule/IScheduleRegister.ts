@@ -1,4 +1,5 @@
 import type { Gender } from "@/enums/GenderEnum";
+import type { Status } from "@/enums/StatusEnum";
 import type IDoctorList from "@/interfaces/doctor/IDoctorList";
 import type IPatientList from "@/interfaces/patient/IPatientList";
 export default interface IScheduleRegister {
@@ -13,4 +14,5 @@ export default interface IScheduleRegister {
   gender: Gender | null;
   doctor: IDoctorList | null;
   patient: IPatientList | null;
+  statusSchedule: Status | null;
 }
