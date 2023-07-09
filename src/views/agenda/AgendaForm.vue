@@ -82,6 +82,47 @@
             {{ schedule.scheduleDateTime.toLocaleString().replace(",", "  ") }}
           </div>
         </CardInput>
+
+        <div
+          class="column is-2"
+          v-if="schedule.id && schedule.statusSchedule != Status.CANCELED"
+        >
+          <button
+            style="
+              margin-top: 2rem;
+              padding: 1rem 2rem 1rem 2rem;
+              background-color: #1ed5a4;
+              color: #fff;
+            "
+            class="button"
+            @click="closeSchedule()"
+            :disabled="schedule.statusSchedule != Status.PENDING"
+          >
+            {{
+              schedule.statusSchedule == Status.DONE
+                ? "Finalizado"
+                : "Finalizar"
+            }}
+          </button>
+        </div>
+
+        <div
+          class="column"
+          v-if="schedule.id && schedule.statusSchedule != Status.DONE"
+        >
+          <button
+            style="margin-top: 2rem; padding: 1rem 2rem 1rem 2rem"
+            class="button is-danger"
+            @click="cancelSchedule()"
+            :disabled="schedule.statusSchedule != Status.PENDING"
+          >
+            {{
+              schedule.statusSchedule == Status.CANCELED
+                ? "Cancelado"
+                : "Cancelar"
+            }}
+          </button>
+        </div>
       </div>
     </template>
 
@@ -121,6 +162,7 @@ import CardInput from "@/components/CardInputComponent.vue";
 import ScheduleService from "@/services/ScheduleService";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import { Gender } from "@/enums/GenderEnum";
+import { Status } from "@/enums/StatusEnum";
 import { reactive, type PropType, watch, ref, watchEffect } from "vue";
 import useNotifierHook from "@/hooks/notifier-hook";
 import { useDoctorStore } from "@/stores/doctor-store";
@@ -167,6 +209,7 @@ watch([() => props.schedule, () => props.scheduleDateTime], ([newValue]) => {
     schedule.scheduleDateTime = newValue.scheduleDateTime;
     schedule.doctor = newValue.doctor;
     schedule.patient = newValue.patient;
+    schedule.statusSchedule = newValue.statusSchedule;
   } else {
     fillScheduleDefault();
   }
@@ -174,7 +217,10 @@ watch([() => props.schedule, () => props.scheduleDateTime], ([newValue]) => {
 
 const edit = ref(false);
 function disableField(): boolean {
-  return schedule.id && !edit.value ? true : false;
+  return (schedule.id && !edit.value) ||
+    schedule.statusSchedule != Status.PENDING
+    ? true
+    : false;
 }
 
 function editSchedule(value: boolean): void {
@@ -267,6 +313,34 @@ function save(): void {
         notifySuccess("Dados alterados com sucesso!");
       })
       .catch((error) => notifyError(error));
+  }
+}
+
+function closeSchedule(): void {
+  if (schedule.id) {
+    if (confirm("Deseja realmente cancelar esse agendamento?")) {
+      schedule.statusSchedule = Status.DONE;
+
+      ScheduleService.updateSchedule(schedule.id, schedule)
+        .then(() => {
+          notifySuccess("Consulta finalizada com sucesso!");
+        })
+        .catch((error) => notifyError(error));
+    }
+  }
+}
+
+function cancelSchedule(): void {
+  if (schedule.id) {
+    if (confirm("Deseja realmente cancelar esse agendamento?")) {
+      schedule.statusSchedule = Status.CANCELED;
+
+      ScheduleService.updateSchedule(schedule.id, schedule)
+        .then(() => {
+          notifySuccess("Agendamento cancelado com sucesso!");
+        })
+        .catch((error) => notifyError(error));
+    }
   }
 }
 </script>
