@@ -18,6 +18,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Status } from "@/enums/StatusEnum";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
 import type { PropType } from "vue";
 
@@ -51,15 +52,21 @@ function getColor(): String {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 
-  if (
-    props.schedule != null &&
-    props.schedule.scheduleDateTime != null &&
-    new Date(props.schedule.scheduleDateTime) > currentDate
-  ) {
-    return `background-color: #2daab8`;
-  } else {
-    return `background-color: #a9a4a4`;
+  if (props.schedule != null) {
+    if (props.schedule.statusSchedule == Status.DONE) {
+      return `background-color: #1ed5a4`;
+    } else if (props.schedule.statusSchedule == Status.CANCELED) {
+      return `background-color: #f14668`;
+    } else {
+      if (
+        props.schedule.scheduleDateTime != null &&
+        new Date(props.schedule.scheduleDateTime) > currentDate
+      ) {
+        return `background-color: #2daab8`;
+      }
+    }
   }
+  return `background-color: #a9a4a4`;
 }
 </script>
 
