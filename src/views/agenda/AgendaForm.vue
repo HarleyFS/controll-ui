@@ -197,6 +197,7 @@ const schedule = reactive<ISchedule>({
   scheduleDateTime: props.scheduleDateTime,
   doctor: doctor.value,
   patient: null,
+  statusSchedule: Status.PENDING,
 });
 
 watch([() => props.schedule, () => props.scheduleDateTime], ([newValue]) => {
@@ -284,6 +285,7 @@ function fillScheduleDefault() {
   schedule.scheduleDateTime = props.scheduleDateTime;
   schedule.doctor = doctor.value;
   schedule.patient = null;
+  schedule.statusSchedule = Status.PENDING;
 }
 
 const { notifySuccess, notifyError } = useNotifierHook();
