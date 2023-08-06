@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import { Status } from "@/enums/StatusEnum";
 import type ISchedule from "@/interfaces/schedule/IScheduleRegister";
-import type { PropType } from "vue";
+import type { PropType, StyleValue } from "vue";
 
 const props = defineProps({
   hour: {
@@ -48,7 +48,7 @@ function open(): void {
     schedule: props.schedule,
   });
 }
-function getColor(): String {
+function getColor(): StyleValue {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 

@@ -12,7 +12,7 @@ export default interface IScheduleRegister {
   scheduleDateTime: Date | null;
   age: Number | null;
   gender: Gender | null;
-  doctor: IDoctorList | null;
+  doctor: IDoctorList | null | undefined;
   patient: IPatientList | null;
   statusSchedule: Status | null;
 }

@@ -119,13 +119,14 @@ let schedule = ref<IScheduleRegister>({
   fullName: "-",
   name: "-",
   lastName: "-",
-  gender: null,
   cellNumber: "",
   birthDate: null,
-  age: null,
   scheduleDateTime: null,
+  age: null,
+  gender: null,
   doctor: null,
   patient: null,
+  statusSchedule: null,
 });
 
 let x = ref<Number>(1);
