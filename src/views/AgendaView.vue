@@ -145,9 +145,9 @@ const minutes = ref(Array.from({ length: 6 }, (_, i) => (i *= 10)));
 const calendarDate = ref(new Date());
 let schedule = ref<ISchedule>();
 
-function getSchedule(hour: number, minute: number) {
+function getSchedule(hour: number, minute: number): any {
+  var name = null;
   if (hour != null && minute != null) {
-    var name = null;
     scheduleList.value.forEach((element) => {
       const boardDate = new Date(calendarDate.value);
       boardDate.setHours(hour, minute, 0, 0);

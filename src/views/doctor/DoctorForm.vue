@@ -60,8 +60,8 @@
             <div class="select">
               <select v-model="doctor.specialty" :disabled="disabledField()">
                 <option
-                  v-for="specialty in doctorStore.specialties"
-                  v-bind:key="specialty"
+                  v-for="(specialty, index) in doctorStore.specialties"
+                  v-bind:key="index"
                 >
                   {{ specialty }}
                 </option>
@@ -224,6 +224,8 @@ import { Gender } from "@/enums/GenderEnum";
 import useNotifierHook from "@/hooks/notifier-hook";
 import { useDoctorStore } from "@/stores/doctor-store";
 const doctorStore = useDoctorStore();
+
+const specialties = doctorStore.specialties;
 
 const props = defineProps({
   render: Boolean,

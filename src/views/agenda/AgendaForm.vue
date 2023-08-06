@@ -79,7 +79,7 @@
 
         <CardInput inputSize="is-3" nameLabel="Horário">
           <div class="custom-label">
-            {{ schedule.scheduleDateTime.toLocaleString().replace(",", "  ") }}
+            {{ schedule.scheduleDateTime?.toLocaleString().replace(",", "  ") }}
           </div>
         </CardInput>
 
@@ -191,10 +191,11 @@ const schedule = reactive<ISchedule>({
   fullName: "",
   name: "",
   lastName: "",
-  gender: Gender.FEMALE,
   cellNumber: "",
   birthDate: null,
   scheduleDateTime: props.scheduleDateTime,
+  age: null,
+  gender: Gender.FEMALE,
   doctor: doctor.value,
   patient: null,
   statusSchedule: Status.PENDING,
