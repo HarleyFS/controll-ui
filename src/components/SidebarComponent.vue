@@ -2,8 +2,7 @@
   <div class="main">
     <aside :class="isExpanded ? 'expanded' : ''">
       <div class="header">
-        <i id="logo-icon" class="fas fa-brands fa-connectdevelop"></i>
-        <!--<img class="logo" src="../assets/logo.svg" alt="logo" />-->
+        <img class="logo" src="../assets/logo.svg" alt="logo"/>
         <div id="title">Controll</div>
         <i
           id="expand-button"
@@ -28,10 +27,10 @@
 
         <div class="profile">
           <div class="profile-details" v-show="isExpanded">
-            <img src="../assets/logo.svg" />
+            <!-- <img src="../assets/logo.svg" /> -->
             <div>
-              <div id="logged-user-name">{{ "Harley Ferreira" }}</div>
-              <div id="company">{{ "Clinica Controll" }}</div>
+              <!-- <div id="logged-user-name">{{ "Harley Ferreira" }}</div> -->
+              <!-- <div id="company">{{ "Clinica Controll" }}</div> -->
             </div>
           </div>
           <router-link @click="logout()" to="/login">
