@@ -1,0 +1,16 @@
+{
+    "routes": [
+      {
+        "route": "/*",
+        "rewrite": "/index.html"
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "^(.*)$",
+        "destination": "https://$1",
+        "scope": "response"
+      }
+    ]
+  }
+  
